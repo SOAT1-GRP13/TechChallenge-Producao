@@ -1,0 +1,30 @@
+name: Docker Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Get version from URL
+      id: get-version
+      run: echo "::set-output name=version::$(curl -s https://devcm.com.br/versao/?projeto=TechChallenge-Producao)"
+
+    - name: Set up version
+      run: echo "VERSION=${{ steps.get-version.outputs.version }}" >> $GITHUB_ENV
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t christiandmelo/tech-challenge-soat1-grp13-producao:${{ env.VERSION }} .
+
+    - name: Push Docker image
+      run: docker push christiandmelo/tech-challenge-soat1-grp13-producao:${{ env.VERSION }}
