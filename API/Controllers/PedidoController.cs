@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Application.Pedidos.Queries;
 using Application.Pedidos.Commands;
 using Application.Pedidos.Boundaries;
-using Application.Pedidos.Queries.DTO;
 using Domain.Base.Communication.Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
@@ -16,55 +14,16 @@ namespace API.Controllers
     [SwaggerTag("Endpoints relacionados a pedidos, sendo necessário se autenticar")]
     public class PedidoController : ControllerBase
     {
-        private readonly IPedidoQueries _pedidoQueries;
         private readonly IMediatorHandler _mediatorHandler;
 
-        public PedidoController(IPedidoQueries pedidoQueries,
-            INotificationHandler<DomainNotification> notifications,
+        public PedidoController(INotificationHandler<DomainNotification> notifications,
             IMediatorHandler mediatorHandler) : base(notifications, mediatorHandler)
         {
             _mediatorHandler = mediatorHandler;
-            _pedidoQueries = pedidoQueries;
-        }
-
-        [HttpGet("pedidos-por-cliente/{clientId}")]
-        [Authorize]
-        [SwaggerOperation(
-            Summary = "Listar pedidos por cliente",
-            Description = "Lista os pedidos pelo id do cliente")]
-        [SwaggerResponse(200, "Retorna pedidos do cliente", typeof(IEnumerable<PedidoDto>))]
-        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
-        public async Task<IActionResult> PedidosPorCliente([FromRoute] Guid clientId)
-        {
-            return Ok(await _pedidoQueries.ObterPedidosCliente(clientId));
-        }
-
-        [HttpGet("pedidos")]
-        [Authorize]
-        [SwaggerOperation(
-            Summary = "Lista todos os pedidos",
-            Description = "Lista todos pedidos de forma não ordenada")]
-        [SwaggerResponse(200, "Retorna pedidos idependente do status", typeof(IEnumerable<PedidoDto>))]
-        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
-        public async Task<IActionResult> Pedidos()
-        {
-            return Ok(await _pedidoQueries.ObterTodosPedidos());
-        }
-
-        [HttpGet("PedidosNaFila")]
-        [Authorize]
-        [SwaggerOperation(
-            Summary = "Lista todos os pedidos na fila",
-            Description = "Lista todos pedidos na fila de forma ordenada conforme Tech Challenge fase 2")]
-        [SwaggerResponse(200, "Retorna pedidos na fila", typeof(IEnumerable<PedidoNaFilaOutput>))]
-        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
-        public async Task<IActionResult> PedidosNaFila()
-        {
-            return Ok(await _pedidoQueries.ObterPedidosParaFila());
         }
 
         [HttpPut("atualizar-status-pedido")]
-        [Authorize]
+        [AllowAnonymous]
         [SwaggerOperation(
             Summary = "Atualizar status do pedido",
             Description = "Atualiza o status do pedido, no momento serve como um agnostico ao mercado pago até termos publicado uma url valida para notification_url")]

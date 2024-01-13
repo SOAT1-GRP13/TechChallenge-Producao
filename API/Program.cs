@@ -12,12 +12,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-builder.Configuration.AddAmazonSecretsManager("us-west-2", "soat1-grp13");
+string connectionString = "";
+string secret = "";
+
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddAmazonSecretsManager("us-west-2", "producao-secret");
+
+    connectionString = builder.Configuration.GetSection("ConnectionString").Value ?? string.Empty;
+
+    secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
+}
+else
+{
+    //local
+    connectionString = builder.Configuration.GetSection("ConnectionString").Value ?? string.Empty;
+
+    secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
+}
+
 builder.Services.Configure<Secrets>(builder.Configuration);
-
-var connectionString = builder.Configuration.GetSection("ConnectionString").Value;
-
-string secret = builder.Configuration.GetSection("ClientSecret").Value;
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(connectionString));
@@ -41,6 +55,9 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+app.UsePathBase(new PathString("/producao"));
+app.UseRouting();
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -56,10 +73,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 await using var scope = app.Services.CreateAsyncScope();
-using var dbApplication = scope.ServiceProvider.GetService<ApplicationDbContext>();
 using var dbPedidos = scope.ServiceProvider.GetService<PedidosContext>();
 
-await dbApplication!.Database.MigrateAsync();
 await dbPedidos!.Database.MigrateAsync();
 
 app.Run();

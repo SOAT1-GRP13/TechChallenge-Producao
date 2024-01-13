@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Pedidos;
 using Application.Pedidos.Boundaries;
-using Application.Pedidos.Queries.DTO;
+using Application.Pedidos.DTO;
 
 namespace Application.Pedidos.AutoMapper
 {
