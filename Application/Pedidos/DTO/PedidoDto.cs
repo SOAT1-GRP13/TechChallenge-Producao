@@ -1,6 +1,6 @@
 ﻿using Domain.Pedidos;
 
-namespace Application.Pedidos.Queries.DTO
+namespace Application.Pedidos.DTO
 {
     public class PedidoDto
     {

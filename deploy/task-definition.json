@@ -1,13 +1,13 @@
 {
-  "family": "soat1-grp13-api",
+  "family": "producao-api",
   "containerDefinitions": [
     {
-      "name": "soat1-grp13-api",
-      "image": "christiandmelo/tech-challenge-soat1-grp13:latest",
+      "name": "producao-api",
+      "image": "christiandmelo/tech-challenge-soat1-grp13-producao:latest",
       "cpu": 0,
       "portMappings": [
         {
-          "name": "soat1-grp13-api-80-tcp",
+          "name": "producao-api-80-tcp",
           "containerPort": 80,
           "hostPort": 80,
           "protocol": "tcp",
@@ -22,7 +22,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-create-group": "true",
-          "awslogs-group": "/ecs/soat1-grp13-api",
+          "awslogs-group": "/ecs/producao-api",
           "awslogs-region": "us-west-2",
           "awslogs-stream-prefix": "ecs"
         },
