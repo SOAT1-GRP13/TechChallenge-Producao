@@ -15,7 +15,7 @@ namespace Infra.Pedidos.Repository
         public PedidoRepository(PedidosContext context, IOptions<Secrets> options)
         {
             _context = context;
-            _settings = options.Value;
+            _settings = options?.Value;
             _optionsBuilder = new DbContextOptions<PedidosContext>();
         }
 
