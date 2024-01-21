@@ -42,9 +42,6 @@ Lembre-se de adicionar o token obtido na resposta da chamada no menu "Authorize"
 Autenticação:
 As chamadas requerem autenticação. Para obter um token Bearer, você pode através do seguinte projeto: https://github.com/SOAT1-GRP13/TechChallenge-SOAT1-GRP13-Auth.
 
-Se você preferir testar nosso serviço de autenticação localmente, siga as orientações no seguinte repositório:
-- https://github.com/christiandmelo/TechChallenge-SOAT1-GRP13-Auth
-
 # 🛠️ Abrir e rodar o projeto utilizando o docker
 
 Para o correto funcionamento precisa do docker instalado.
