@@ -6,24 +6,33 @@ using Application.Pedidos.Commands;
 using Application.Pedidos.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
+using Domain.RabbitMQ;
+using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace Application.Pedidos.Handlers
 {
-    public class AtualizarStatusPedidoCommandHandler : IRequestHandler<AtualizarStatusPedidoCommand, PedidoDto?>
+    public class PedidoEmPreparacaoCommandHandler : IRequestHandler<PedidoEmPreparacaoCommand, PedidoDto?>
     {
         private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
+        private readonly IRabbitMQService _rabbitMQService;
+        private readonly IConfiguration _configuration;
 
-        public AtualizarStatusPedidoCommandHandler(
+        public PedidoEmPreparacaoCommandHandler(
             IPedidoUseCase statusPedidoUseCase,
-            IMediatorHandler mediatorHandler
+            IMediatorHandler mediatorHandler,
+            IRabbitMQService rabbitMQService,
+            IConfiguration configuration
         )
         {
             _pedidoUseCase = statusPedidoUseCase;
             _mediatorHandler = mediatorHandler;
+            _rabbitMQService = rabbitMQService;
+            _configuration = configuration;
         }
 
-        public async Task<PedidoDto?> Handle(AtualizarStatusPedidoCommand request, CancellationToken cancellationToken)
+        public async Task<PedidoDto?> Handle(PedidoEmPreparacaoCommand request, CancellationToken cancellationToken)
         {
             if (!request.EhValido())
             {
@@ -42,6 +51,10 @@ namespace Application.Pedidos.Handlers
                     await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido não encontrado"));
                     return null;
                 }
+
+                string mensagem = JsonSerializer.Serialize(pedidoDto);
+                var fila = _configuration.GetSection("RabbitMQ:QueuePedidoPreparando").Value;
+                _rabbitMQService.PublicaMensagem(fila, mensagem);
 
                 return pedidoDto;
             }

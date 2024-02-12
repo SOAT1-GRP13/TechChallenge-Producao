@@ -5,11 +5,11 @@ using Application.Pedidos.Commands.Validation;
 
 namespace Application.Pedidos.Commands
 {
-    public class AtualizarStatusPedidoCommand : Command<PedidoDto?>
+    public class PedidoEmPreparacaoCommand : Command<PedidoDto?>
     {
         public AtualizarStatusPedidoInput Input { get; set; }
 
-        public AtualizarStatusPedidoCommand(AtualizarStatusPedidoInput input)
+        public PedidoEmPreparacaoCommand(AtualizarStatusPedidoInput input)
         {
             Input = input;
         }

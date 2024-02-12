@@ -18,7 +18,6 @@ namespace Infra.Migrations
                     Codigo = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     ClienteId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ValorTotal = table.Column<decimal>(type: "numeric", nullable: false),
                     DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     PedidoStatus = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -35,8 +34,7 @@ namespace Infra.Migrations
                     PedidoId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProdutoId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProdutoNome = table.Column<string>(type: "varchar(250)", nullable: false),
-                    Quantidade = table.Column<int>(type: "integer", nullable: false),
-                    ValorUnitario = table.Column<decimal>(type: "numeric", nullable: false)
+                    Quantidade = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Domain.Pedidos;
+using Application.Pedidos.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Application.Pedidos.Commands;
 using Application.Pedidos.Boundaries;
@@ -22,18 +24,39 @@ namespace API.Controllers
             _mediatorHandler = mediatorHandler;
         }
 
-        [HttpPut("atualizar-status-pedido")]
+        [HttpPut("pedido-em-preparacao/{id}")]
         [AllowAnonymous]
         [SwaggerOperation(
-            Summary = "Atualizar status do pedido",
-            Description = "Atualiza o status do pedido, no momento serve como um agnostico ao mercado pago até termos publicado uma url valida para notification_url")]
-        [SwaggerResponse(200, "Retorna o pedido atualizado", typeof(PedidoOutput))]
+            Summary = "Colocar o pedido Em Preparacao",
+            Description = "Atualiza o status do pedido para Em Preparação")]
+        [SwaggerResponse(200, "Retorna o pedido atualizado", typeof(PedidoDto))]
         [SwaggerResponse(404, "Caso não encontre o pedido com o Id informado")]
         [SwaggerResponse(500, "Caso algo inesperado aconteça")]
-        public async Task<IActionResult> AtualizarStatusPedido([FromBody] AtualizarStatusPedidoInput input)
+        public async Task<IActionResult> PedidoEmPreparacao([FromRoute] Guid id)
         {
-            var command = new AtualizarStatusPedidoCommand(input);
-            var pedido = await _mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoOutput>(command);
+            var input = new AtualizarStatusPedidoInput(id, (int)PedidoStatus.EmPreparacao);
+            var command = new PedidoEmPreparacaoCommand(input);
+            var pedido = await _mediatorHandler.EnviarComando<PedidoEmPreparacaoCommand, PedidoDto?>(command);
+
+            if (!OperacaoValida())
+                return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());
+
+            return Ok(pedido);
+        }
+
+        [HttpPut("pedido-pronto/{id}")]
+        [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = "Colocar o pedido pronto",
+            Description = "Atualiza o status do pedido para Pronto")]
+        [SwaggerResponse(200, "Retorna o pedido atualizado", typeof(PedidoDto))]
+        [SwaggerResponse(404, "Caso não encontre o pedido com o Id informado")]
+        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
+        public async Task<IActionResult> PedidoPronto([FromRoute] Guid id)
+        {
+            var input = new AtualizarStatusPedidoInput(id, (int)PedidoStatus.EmPreparacao);
+            var command = new PedidoProntoCommand(input);
+            var pedido = await _mediatorHandler.EnviarComando<PedidoProntoCommand, PedidoDto?>(command);
 
             if (!OperacaoValida())
                 return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());

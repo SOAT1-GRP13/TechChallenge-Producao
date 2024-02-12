@@ -1,11 +1,14 @@
 using API.Data;
 using API.Setup;
 using Infra.Pedidos;
+using Infra.RabbitMQ;
+using Domain.RabbitMQ;
 using System.Reflection;
+using Domain.Configuration;
+using Infra.RabbitMQ.Consumers;
 using Microsoft.EntityFrameworkCore;
 using Application.Pedidos.AutoMapper;
 using Swashbuckle.AspNetCore.Filters;
-using Domain.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +43,10 @@ else
     connectionString = builder.Configuration.GetSection("ConnectionString").Value ?? string.Empty;
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
+
+    var rabbitMQOptions = new RabbitMQOptions();
+    builder.Configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
+    builder.Services.AddSingleton(rabbitMQOptions);
 }
 
 builder.Services.Configure<Secrets>(builder.Configuration);
@@ -59,6 +66,15 @@ builder.Services.AddSwaggerGenConfig();
 
 builder.Services.AddAutoMapper(typeof(PedidosMappingProfile));
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+builder.Services.AddSingleton<RabbitMQModelFactory>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var modelFactory = serviceProvider.GetRequiredService<RabbitMQModelFactory>();
+    return modelFactory.CreateModel();
+});
+builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+builder.Services.AddHostedService<PedidoPagoSubscriber>();
 
 builder.Services.RegisterServices();
 

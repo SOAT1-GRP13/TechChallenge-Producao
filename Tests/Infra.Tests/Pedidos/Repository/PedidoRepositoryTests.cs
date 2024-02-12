@@ -3,6 +3,7 @@ using Infra.Pedidos;
 using Domain.Pedidos;
 using Infra.Pedidos.Repository;
 using Microsoft.EntityFrameworkCore;
+using Domain.Base.Communication.Mediator;
 
 namespace Infra.Tests.Pedidos.Repository
 {
@@ -12,24 +13,25 @@ namespace Infra.Tests.Pedidos.Repository
         public async Task ObterPorId_DeveRetornarPedido_QuandoPedidoExiste()
         {
             // Arrange
+            var mediatorHandler = new Mock<IMediatorHandler>();
             var options = new DbContextOptionsBuilder<PedidosContext>()
                 .UseInMemoryDatabase(databaseName: "TestePedidoDb")
                 .Options;
 
-            using (var context = new PedidosContext(options, null))
+            using (var context = new PedidosContext(options, mediatorHandler.Object))
             {
-                var pedidoObj = new Pedido(Guid.NewGuid(), false, 0, 10);
+                var pedidoObj = new Pedido(Guid.NewGuid(), 10);
                 context.Pedidos.Add(pedidoObj);
                 context.SaveChanges();
 
-                var repository = new PedidoRepository(context, null);
+                var repository = new PedidoRepository(context);
 
                 // Act
                 var pedido = await repository.ObterPorId(pedidoObj.Id);
 
                 // Assert
                 Assert.NotNull(pedido);
-                Assert.Equal(pedidoObj.Id, pedido.Id);
+                Assert.Equal(pedidoObj.Id, pedido?.Id);
             }
         }
 
@@ -37,13 +39,14 @@ namespace Infra.Tests.Pedidos.Repository
         public async Task ObterPorId_DeveRetornarNull_QuandoPedidoNaoExiste()
         {
             // Arrange
+            var mediatorHandler = new Mock<IMediatorHandler>();
             var options = new DbContextOptionsBuilder<PedidosContext>()
                 .UseInMemoryDatabase(databaseName: "TestePedidoDb")
                 .Options;
 
-            using (var context = new PedidosContext(options, null))
+            using (var context = new PedidosContext(options, mediatorHandler.Object))
             {
-                var repository = new PedidoRepository(context, null);
+                var repository = new PedidoRepository(context);
 
                 // Act
                 var pedido = await repository.ObterPorId(Guid.NewGuid());
@@ -57,28 +60,36 @@ namespace Infra.Tests.Pedidos.Repository
         public async Task Atualizar_DeveAlterarDadosDoPedido_QuandoPedidoExiste()
         {
             // Arrange
+            var mediatorHandler = new Mock<IMediatorHandler>();
             var options = new DbContextOptionsBuilder<PedidosContext>()
                 .UseInMemoryDatabase(databaseName: "TestePedidoDbAtualizar")
                 .Options;
 
-            var pedido = new Pedido(Guid.NewGuid(), false, 0, 10);
-            pedido.TornarRascunho();
+            var pedido = new Pedido(Guid.NewGuid(), 10);
+            pedido.ColocarPedidoComoRecebido();
 
             // Criando e salvando o pedido original
-            using (var context = new PedidosContext(options, null))
+            using (var context = new PedidosContext(options, mediatorHandler.Object))
             {                
                 context.Pedidos.Add(pedido);
                 await context.SaveChangesAsync();
 
-                var repository = new PedidoRepository(context, null);
+                var repository = new PedidoRepository(context);
                 var pedidoParaAtualizar = await context.Pedidos.FindAsync(pedido.Id);
-                pedidoParaAtualizar.IniciarPedido();
+
+                if(pedidoParaAtualizar is null)
+                {
+                    Assert.True(false, "Pedido não encontrado");
+                    return;
+                }
+
+                pedidoParaAtualizar.ColocarPedidoEmPreparacao();
                 repository.Atualizar(pedidoParaAtualizar);
                 await context.SaveChangesAsync();
 
                 var pedidoAtualizado = await context.Pedidos.FindAsync(pedido.Id);
                 Assert.NotNull(pedidoAtualizado);
-                Assert.Equal(PedidoStatus.Iniciado, pedido.PedidoStatus);
+                Assert.Equal(PedidoStatus.Recebido, pedido.PedidoStatus);
             }
         }
 
@@ -86,12 +97,13 @@ namespace Infra.Tests.Pedidos.Repository
         public void Dispose_DeveChamarDisposeDoContexto()
         {
             // Arrange
+            var mediatorHandler = new Mock<IMediatorHandler>();
             var options = new DbContextOptionsBuilder<PedidosContext>()
                 .UseInMemoryDatabase(databaseName: "TestePedidoDbDispose")
                 .Options;
 
-            var mockContext = new Mock<PedidosContext>(options, null);
-            var repository = new PedidoRepository(mockContext.Object, null);
+            var mockContext = new Mock<PedidosContext>(options, mediatorHandler.Object);
+            var repository = new PedidoRepository(mockContext.Object);
 
             // Act
             repository.Dispose();
@@ -99,5 +111,66 @@ namespace Infra.Tests.Pedidos.Repository
             // Assert
             mockContext.Verify(x => x.Dispose(), Times.Once());
         }
+
+        #region testes ObterTodosPedidos
+        [Fact]
+        public async Task ObterTodosPedidos_DeveRetornarTodosPedidos()
+        {
+            var context = CreateDbContext();
+
+            var pedido1 = new Pedido(Guid.NewGuid(), 100);
+            var pedido2 = new Pedido(Guid.NewGuid(), 150);
+            context.Pedidos.Add(pedido1);
+            context.Pedidos.Add(pedido2);
+            await context.SaveChangesAsync();
+
+            var repository = new PedidoRepository(context);
+            var pedidos = await repository.ObterTodosPedidos();
+
+            Assert.Contains(pedidos, p => p.Id == pedido1.Id);
+            Assert.Contains(pedidos, p => p.Id == pedido2.Id);
+        }
+        #endregion
+
+        #region testes ObterPedidosParaFila
+        [Fact]
+        public async Task ObterPedidosParaFila_DeveRetornarPedidosConformeStatus()
+        {
+            var context = CreateDbContext();
+
+            var pedido1 = new Pedido(Guid.NewGuid(), 100);
+            pedido1.ColocarPedidoComoRecebido();
+            var pedido2 = new Pedido(Guid.NewGuid(), 150);
+            pedido2.ColocarPedidoEmPreparacao();
+            var pedido4 = new Pedido(Guid.NewGuid(), 250);
+            pedido4.CancelarPedido();
+            var pedido5 = new Pedido(Guid.NewGuid(), 300);
+            pedido5.ColocarPedidoComoPronto();
+            context.Pedidos.AddRange(pedido1, pedido2, pedido4, pedido5);
+            await context.SaveChangesAsync();
+
+            var repository = new PedidoRepository(context);
+            var pedidosParaFila = await repository.ObterPedidosParaFila();
+
+            Assert.Contains(pedidosParaFila, p => p.Id == pedido1.Id);
+            Assert.Contains(pedidosParaFila, p => p.Id == pedido2.Id);
+            Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido4.Id);
+            Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido5.Id);
+        }
+        #endregion
+
+        #region metodos privados
+        public static PedidosContext CreateDbContext()
+        {
+            var mediatorHandler = new Mock<IMediatorHandler>();
+            var options = new DbContextOptionsBuilder<PedidosContext>()
+                .UseInMemoryDatabase(databaseName: "TestePedidoDbDispose")
+                .Options;
+
+            var dbContext = new PedidosContext(options, mediatorHandler.Object);
+
+            return dbContext;
+        }
+        #endregion
     }
 }

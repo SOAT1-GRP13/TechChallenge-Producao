@@ -7,11 +7,7 @@ namespace API.SwaggerExamples
     {
         public AtualizarStatusPedidoInput GetExamples()
         {
-            return new AtualizarStatusPedidoInput
-            {
-                IdPedido = new Guid("bdf2f9b7-087d-4f06-a34f-1278c694c609"),
-                Status = 1
-            };
+            return new AtualizarStatusPedidoInput(new Guid("bdf2f9b7-087d-4f06-a34f-1278c694c609"), 1);
         }
     }
 }

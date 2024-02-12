@@ -30,12 +30,6 @@ namespace Application.Pedidos.UseCases
             if (pedido is null)
                 return new PedidoDto();
 
-            switch (novoStatus)
-            {
-                case PedidoStatus.Iniciado:
-                    throw new DomainException("Não é permitido ir para esse status diretamente!");
-            }
-
             pedido.AtualizarStatus(novoStatus);
 
             _pedidoRepository.Atualizar(pedido);

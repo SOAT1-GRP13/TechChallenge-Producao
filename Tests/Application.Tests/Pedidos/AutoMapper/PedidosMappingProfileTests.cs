@@ -20,33 +20,28 @@ namespace Application.Tests.Pedidos.AutoMapper
         public void DeveMapearPedidoParaPedidoDtoCorretamente()
         {
             // Arrange
-            var pedido = new Pedido(Guid.NewGuid(), false, 0, 150m);
+            var pedido = pedidoFake();
 
             // Act
             var pedidoDto = _mapper.Map<PedidoDto>(pedido);
 
             // Assert
-            Assert.Equal(pedido.Id, pedidoDto.Id);
-            Assert.Equal(pedido.ValorTotal, pedidoDto.ValorTotal);
+            Assert.Equal(pedido.Id, pedidoDto.PedidoId);
+            Assert.Equal(pedido.PedidoStatus, pedidoDto.PedidoStatus);
         }
 
-        [Fact]
-        public void DeveMapearPedidoDtoParaPedidoOutputCorretamente()
+        #region Metodos privados
+        private Pedido pedidoFake()
         {
-            // Arrange
-            var pedidoDto = new PedidoDto
-            {
-                Id = Guid.NewGuid(),
-                ValorTotal = 150m,
-                PedidoStatus = PedidoStatus.Pago
-            };
+            var item1 = new PedidoItem(Guid.NewGuid(), "Produto 1", 2);
+            var item2 = new PedidoItem(Guid.NewGuid(), "Produto 2", 3);
 
-            // Act
-            var pedidoOutput = _mapper.Map<PedidoOutput>(pedidoDto);
+            var itens = new List<PedidoItem> { item1, item2 };
 
-            // Assert
-            Assert.Equal(pedidoDto.Id, pedidoOutput.Id);
-            Assert.Equal(pedidoDto.ValorTotal, pedidoOutput.ValorTotal);
+            var pedido = new Pedido(Guid.NewGuid(), itens);
+
+            return pedido;
         }
+        #endregion
     }
 }

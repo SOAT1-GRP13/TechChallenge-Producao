@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Domain.Pedidos;
-using Application.Pedidos.Boundaries;
 using Application.Pedidos.DTO;
 
 namespace Application.Pedidos.AutoMapper
@@ -9,9 +8,15 @@ namespace Application.Pedidos.AutoMapper
     {
         public PedidosMappingProfile()
         {
-            CreateMap<Pedido, PedidoDto>();
+            CreateMap<PedidoDto, Pedido>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.PedidoId))
+                .ForMember(dest => dest.PedidoItems, opt => opt.MapFrom(src => src.Items));
+            CreateMap<PedidoItemDto, PedidoItem>();
 
-            CreateMap<PedidoDto, PedidoOutput>();
+            CreateMap<Pedido, PedidoDto>()
+                .ForMember(dest => dest.PedidoId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.PedidoItems));
+            CreateMap<PedidoItem, PedidoItemDto>();
         }
     }
 }

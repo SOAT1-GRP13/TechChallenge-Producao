@@ -1,30 +1,24 @@
-﻿using Domain.Base.Data;
-using Domain.Configuration;
-using Domain.Pedidos;
+﻿using Domain.Pedidos;
+using Domain.Base.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace Infra.Pedidos.Repository
 {
     public class PedidoRepository : IPedidoRepository
     {
         private readonly PedidosContext _context;
-        private readonly Secrets _settings;
-        private readonly DbContextOptions<PedidosContext> _optionsBuilder;
 
-        public PedidoRepository(PedidosContext context, IOptions<Secrets> options)
+        public PedidoRepository(PedidosContext context)
         {
             _context = context;
-            _settings = options?.Value;
-            _optionsBuilder = new DbContextOptions<PedidosContext>();
         }
 
         public IUnitOfWork UnitOfWork => _context;
 
-        public async Task<Pedido> ObterPorId(Guid id)
+        public async Task<Pedido?> ObterPorId(Guid id)
         {
             var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null) return null;
+            if (pedido is null) return null;
 
             await _context.Entry(pedido)
                 .Collection(i => i.PedidoItems).LoadAsync(); // Popula pedido evitando querys com join
@@ -36,6 +30,26 @@ namespace Infra.Pedidos.Repository
         public void Atualizar(Pedido pedido)
         {
             _context.Pedidos.Update(pedido);
+        }
+
+        public async Task<IEnumerable<Pedido>> ObterTodosPedidos()
+        {
+            return await _context.Pedidos.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IEnumerable<Pedido>> ObterPedidosParaFila()
+        {
+            var pedido = await _context.Pedidos
+                                       .Where(p => p.PedidoStatus != PedidoStatus.Finalizado
+                                                && p.PedidoStatus != PedidoStatus.Rascunho
+                                                && p.PedidoStatus != PedidoStatus.Cancelado
+                                                && p.PedidoStatus != PedidoStatus.Pronto)
+                                       .Include(p => p.PedidoItems)
+                                       .OrderBy(p => p.DataCadastro)
+                                       .OrderBy(p => p.PedidoStatus)
+                                       .ToListAsync();
+
+            return pedido;
         }
 
         public void Dispose()

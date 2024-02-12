@@ -8,6 +8,7 @@ using Domain.Base.Messages.CommonMessages.Notifications;
 using Application.Pedidos.Handlers;
 using Application.Pedidos.Boundaries;
 using Application.Pedidos.UseCases;
+using Application.Pedidos.DTO;
 
 namespace API.Setup
 {
@@ -26,7 +27,8 @@ namespace API.Setup
             services.AddScoped<IPedidoUseCase, PedidoUseCase>();
             services.AddScoped<PedidosContext>();
 
-            services.AddScoped<IRequestHandler<AtualizarStatusPedidoCommand, PedidoOutput>, AtualizarStatusPedidoCommandHandler>();
+            services.AddScoped<IRequestHandler<PedidoEmPreparacaoCommand, PedidoDto?>, PedidoEmPreparacaoCommandHandler>();
+            services.AddScoped<IRequestHandler<PedidoProntoCommand, PedidoDto?>, PedidoProntoCommandHandler>();
             services.AddScoped<IRequestHandler<ConsultarStatusPedidoCommand, ConsultarStatusPedidoOutput>, ConsultarStatusPedidoCommandHandler>();
         }
     }
