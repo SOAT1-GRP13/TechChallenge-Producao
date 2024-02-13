@@ -21,7 +21,8 @@ namespace Infra.RabbitMQ
                 HostName = _options.Hostname,
                 Port = _options.Port,
                 UserName = _options.Username,
-                Password = _options.Password
+                Password = _options.Password,
+                VirtualHost = _options.VirtualHost
             };
 
             var connection = factory.CreateConnection();
