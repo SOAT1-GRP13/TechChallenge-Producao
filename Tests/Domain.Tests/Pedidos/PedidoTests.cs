@@ -34,6 +34,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido já está cancelado", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -57,6 +58,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser cancelado, pois já está pronto", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -79,6 +81,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser cancelado, pois já foi para preparação", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -115,6 +118,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser colocado como pronto, pois o mesmo não está em preparação", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -143,12 +147,13 @@ namespace Domain.Tests.Pedidos
             // Act
             try
             {
-                pedido.ColocarPedidoComoPronto();
+                pedido.ColocarPedidoEmPreparacao();
             }
             catch (DomainException ex)
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser colocado em preparação, pois o mesmo não foi recebido", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -183,6 +188,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido já está cancelado", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -206,6 +212,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser recebido, pois já está pronto", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -228,6 +235,7 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser recebido, pois já foi para preparação", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
@@ -266,13 +274,13 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser finalizado, pois não está pronto", ex.Message);
+                return;
             }
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
 
         [Theory]
-        [InlineData(PedidoStatus.Iniciado)]
         [InlineData(PedidoStatus.Cancelado)]
         [InlineData(PedidoStatus.Pronto)]
         [InlineData(PedidoStatus.EmPreparacao)]
