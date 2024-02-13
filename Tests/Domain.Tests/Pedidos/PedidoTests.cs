@@ -88,6 +88,31 @@ namespace Domain.Tests.Pedidos
         }
 
         [Fact]
+        public void CancelarPedido_SeJaEstiverFinalizado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+            pedido.ColocarPedidoComoPronto();
+            pedido.FinalizarPedido();
+
+            // Act
+            try
+            {
+                pedido.CancelarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido já foi finalizado", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
         public void ColocarPedidoComoPronto_DeveDefinirStatusComoPronto()
         {
             // Arrange
@@ -235,6 +260,31 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido não pode ser recebido, pois já foi para preparação", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoComoRecebido_SeJaEstiverFinalizado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+            pedido.ColocarPedidoComoPronto();
+            pedido.FinalizarPedido();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoRecebido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido já foi finalizado", ex.Message);
                 return;
             }
 

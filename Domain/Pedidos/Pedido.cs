@@ -34,6 +34,9 @@ namespace Domain.Pedidos
             if (PedidoStatus == PedidoStatus.EmPreparacao)
                 throw new DomainException("Pedido não pode ser cancelado, pois já foi para preparação");
 
+            if (PedidoStatus == PedidoStatus.Finalizado)
+                throw new DomainException("Pedido já foi finalizado");
+
             PedidoStatus = PedidoStatus.Cancelado;
         }
 
@@ -63,6 +66,9 @@ namespace Domain.Pedidos
 
             if (PedidoStatus == PedidoStatus.EmPreparacao)
                 throw new DomainException("Pedido não pode ser recebido, pois já foi para preparação");
+
+            if (PedidoStatus == PedidoStatus.Finalizado)
+                throw new DomainException("Pedido já foi finalizado");
 
             PedidoStatus = PedidoStatus.Recebido;
         }
