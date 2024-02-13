@@ -39,7 +39,7 @@ namespace Application.Tests.Pedidos.UseCases
             _unitOfWorkMock.Setup(u => u.Commit()).ReturnsAsync(true);
 
             // Act
-            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Iniciado);
+            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Recebido);
 
             // Assert
             Assert.Equal(pedidoDto, resultado);

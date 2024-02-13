@@ -5,6 +5,7 @@ namespace Domain.Tests.Pedidos
 {
     public class PedidoTests
     {
+        #region CancelarPedido
         [Fact]
         public void CancelarPedido_DeveDefinirStatusComoCancelado()
         {
@@ -111,7 +112,9 @@ namespace Domain.Tests.Pedidos
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
+        #endregion
 
+        #region ColocarPedidoComoPronto
         [Fact]
         public void ColocarPedidoComoPronto_DeveDefinirStatusComoPronto()
         {
@@ -148,7 +151,9 @@ namespace Domain.Tests.Pedidos
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
+        #endregion
 
+        #region ColocarPedidoEmPreparacao
         [Fact]
         public void ColocarPedidoEmPreparacao_DeveDefinirStatusComoEmPreparacao()
         {
@@ -183,7 +188,9 @@ namespace Domain.Tests.Pedidos
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
+        #endregion
 
+        #region ColocarPedidoComoRecebido
         [Fact]
         public void ColocarPedidoComoRecebido_DeveDefinirStatusComoRecebido()
         {
@@ -290,7 +297,9 @@ namespace Domain.Tests.Pedidos
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
+        #endregion
 
+        #region FinalizarPedido
         [Fact]
         public void FinalizarPedido_DeveDefinirStatusComoFinalizado()
         {
@@ -329,6 +338,7 @@ namespace Domain.Tests.Pedidos
 
             Assert.True(false, "Deveria ter lançado exceção");
         }
+        #endregion
 
         [Theory]
         [InlineData(PedidoStatus.Cancelado)]
@@ -343,13 +353,13 @@ namespace Domain.Tests.Pedidos
 
             switch (novoStatus)
             {
-                case PedidoStatus.Pronto:
-                    pedido.ColocarPedidoComoRecebido();
-                    pedido.ColocarPedidoEmPreparacao();
-                    break;
                 case PedidoStatus.EmPreparacao:
                     pedido.ColocarPedidoComoRecebido();
                     break;
+                case PedidoStatus.Pronto:
+                    pedido.ColocarPedidoComoRecebido();
+                    pedido.ColocarPedidoEmPreparacao();
+                    break;                
                 case PedidoStatus.Finalizado:
                     pedido.ColocarPedidoComoRecebido();
                     pedido.ColocarPedidoEmPreparacao();

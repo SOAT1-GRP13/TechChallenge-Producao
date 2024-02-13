@@ -89,7 +89,7 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
-            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.NewGuid(), 1));
+            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.NewGuid(), 6));
             var notificationHandler = new DomainNotificationHandler();
 
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(command.Input.IdPedido, (PedidoStatus)command.Input.Status))

@@ -46,7 +46,7 @@ namespace Application.Pedidos.Handlers
                 var input = request.Input;
                 var pedidoDto = await _pedidoUseCase.TrocaStatusPedido(input.IdPedido, (PedidoStatus)input.Status);
 
-                if (pedidoDto is null)
+                if (pedidoDto is null || pedidoDto.PedidoId == Guid.Empty)
                 {
                     await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido não encontrado"));
                     return null;

@@ -29,7 +29,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()))
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoEmPreparacaoCommand, PedidoDto?>(It.IsAny<PedidoEmPreparacaoCommand>()))
             .ReturnsAsync(pedidoDto);
 
             var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);
@@ -86,7 +86,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()))
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoProntoCommand, PedidoDto?>(It.IsAny<PedidoProntoCommand>()))
             .ReturnsAsync(pedidoDto);
 
             var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);
@@ -143,7 +143,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()))
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoFinalizadoCommand, PedidoDto?>(It.IsAny<PedidoFinalizadoCommand>()))
             .ReturnsAsync(pedidoDto);
 
             var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);

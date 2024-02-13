@@ -1,11 +1,10 @@
-using Application.Pedidos.Boundaries;
+using MediatR;
+using Domain.Base.DomainObjects;
 using Application.Pedidos.Commands;
 using Application.Pedidos.UseCases;
-using AutoMapper;
+using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using MediatR;
 
 namespace Application.Pedidos.Handlers
 {

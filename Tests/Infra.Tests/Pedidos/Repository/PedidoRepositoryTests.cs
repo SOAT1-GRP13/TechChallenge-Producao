@@ -89,7 +89,7 @@ namespace Infra.Tests.Pedidos.Repository
 
                 var pedidoAtualizado = await context.Pedidos.FindAsync(pedido.Id);
                 Assert.NotNull(pedidoAtualizado);
-                Assert.Equal(PedidoStatus.Recebido, pedido.PedidoStatus);
+                Assert.Equal(PedidoStatus.EmPreparacao, pedidoAtualizado?.PedidoStatus);
             }
         }
 
@@ -141,10 +141,13 @@ namespace Infra.Tests.Pedidos.Repository
             var pedido1 = pedidoFake();
             pedido1.ColocarPedidoComoRecebido();
             var pedido2 = pedidoFake();
+            pedido2.ColocarPedidoComoRecebido();
             pedido2.ColocarPedidoEmPreparacao();
             var pedido4 = pedidoFake();
             pedido4.CancelarPedido();
             var pedido5 = pedidoFake();
+            pedido5.ColocarPedidoComoRecebido();
+            pedido5.ColocarPedidoEmPreparacao();
             pedido5.ColocarPedidoComoPronto();
             context.Pedidos.AddRange(pedido1, pedido2, pedido4, pedido5);
             await context.SaveChangesAsync();
