@@ -11,22 +11,22 @@ namespace API.Tests.Controllers
         {
         }
 
-        public bool OperacaoValida()
+        public new bool OperacaoValida()
         {
             return base.OperacaoValida();
         }
 
-        public IEnumerable<string> ObterMensagensErro()
+        public new IEnumerable<string> ObterMensagensErro()
         {
             return base.ObterMensagensErro();
         }
 
-        public void NotificarErro(string codigo, string mensagem)
+        public new void NotificarErro(string codigo, string mensagem)
         {
             base.NotificarErro(codigo, mensagem);
         }
 
-        public Guid ObterClienteId()
+        public new Guid ObterClienteId()
         {
             return base.ObterClienteId();
         }

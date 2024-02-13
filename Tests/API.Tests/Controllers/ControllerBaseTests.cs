@@ -15,7 +15,8 @@ namespace API.Tests.Controllers
             // Arrange
             var notifications = new DomainNotificationHandler();
             notifications.Handle(new DomainNotification("Erro", "Mensagem de erro"), CancellationToken.None).Wait();
-            var controller = new MockController(notifications, null); // MockController é uma implementação concreta de ControllerBase
+            var mediatorMock = new Mock<IMediatorHandler>();
+            var controller = new MockController(notifications, mediatorMock.Object); // MockController é uma implementação concreta de ControllerBase
 
             // Act
             var operacaoValida = controller.OperacaoValida();
@@ -45,6 +46,7 @@ namespace API.Tests.Controllers
         public void ObterClienteId_DeveRetornarGuid_QuandoUsuarioAutenticado()
         {
             // Arrange
+            var mediatorMock = new Mock<IMediatorHandler>();
             var userId = Guid.NewGuid();
             var claims = new List<Claim>
             {
@@ -57,7 +59,7 @@ namespace API.Tests.Controllers
             {
                 HttpContext = new DefaultHttpContext { User = principal }
             };
-            var controller = new MockController(new DomainNotificationHandler(), null)
+            var controller = new MockController(new DomainNotificationHandler(), mediatorMock.Object)
             {
                 ControllerContext = controllerContext
             };
@@ -73,13 +75,14 @@ namespace API.Tests.Controllers
         public void ObterClienteId_DeveLancarExcecao_QuandoUsuarioNaoAutenticado()
         {
             // Arrange
+            var mediatorMock = new Mock<IMediatorHandler>();
             var principal = new ClaimsPrincipal();
 
             var controllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = principal }
             };
-            var controller = new MockController(new DomainNotificationHandler(), null)
+            var controller = new MockController(new DomainNotificationHandler(), mediatorMock.Object)
             {
                 ControllerContext = controllerContext
             };
