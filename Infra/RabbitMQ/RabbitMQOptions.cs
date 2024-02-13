@@ -10,6 +10,7 @@
             QueuePedidoPago = string.Empty;
             QueuePedidoPreparando = string.Empty;
             QueuePedidoPronto = string.Empty;
+            QueuePedidoFinalizado = string.Empty;
         }
 
         public string Hostname { get; set; }
@@ -19,5 +20,6 @@
         public string QueuePedidoPago { get; set; }
         public string QueuePedidoPreparando { get; set; }
         public string QueuePedidoPronto { get; set; }
+        public string QueuePedidoFinalizado { get; set; }
     }
 }

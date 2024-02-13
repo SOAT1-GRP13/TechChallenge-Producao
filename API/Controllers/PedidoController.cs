@@ -64,6 +64,26 @@ namespace API.Controllers
             return Ok(pedido);
         }
 
+        [HttpPut("pedido-finalizado/{id}")]
+        [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = "Colocar o pedido como finalizado",
+            Description = "Atualiza o status do pedido para Finalizado")]
+        [SwaggerResponse(200, "Retorna o pedido atualizado", typeof(PedidoDto))]
+        [SwaggerResponse(404, "Caso não encontre o pedido com o Id informado")]
+        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
+        public async Task<IActionResult> PedidoFinalizado([FromRoute] Guid id)
+        {
+            var input = new AtualizarStatusPedidoInput(id, (int)PedidoStatus.Finalizado);
+            var command = new PedidoFinalizadoCommand(input);
+            var pedido = await _mediatorHandler.EnviarComando<PedidoFinalizadoCommand, PedidoDto?>(command);
+
+            if (!OperacaoValida())
+                return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());
+
+            return Ok(pedido);
+        }
+
         [HttpGet("consultar-status-pedido/{pedidoId}")]
         [Authorize]
         [SwaggerOperation(

@@ -1,10 +1,5 @@
-﻿using Domain.Base.DomainObjects;
-using Domain.Pedidos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Pedidos;
+using Domain.Base.DomainObjects;
 
 namespace Domain.Tests.Pedidos
 {
@@ -24,10 +19,78 @@ namespace Domain.Tests.Pedidos
         }
 
         [Fact]
+        public void CancelarPedido_SeJaEstiverCancelado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.CancelarPedido();
+
+            // Act
+            try 
+            {
+                pedido.CancelarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido já está cancelado", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void CancelarPedido_SeJaEstiverPronto_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+            pedido.ColocarPedidoComoPronto();
+
+            // Act
+            try
+            {
+                pedido.CancelarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser cancelado, pois já está pronto", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void CancelarPedido_SeJaEstiverEmPreparacao_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+
+            // Act
+            try
+            {
+                pedido.CancelarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser cancelado, pois já foi para preparação", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
         public void ColocarPedidoComoPronto_DeveDefinirStatusComoPronto()
         {
             // Arrange
             var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
 
             // Act
             pedido.ColocarPedidoComoPronto();
@@ -37,10 +100,32 @@ namespace Domain.Tests.Pedidos
         }
 
         [Fact]
-        public void ColocarPedidoEmPreparacao_DeveDefinirStatusComoPago()
+        public void ColocarPedidoComoPronto_SeNaoEstiverEmPreparacao_DeveLancarExcecao()
         {
             // Arrange
             var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoPronto();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser colocado como pronto, pois o mesmo não está em preparação", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoEmPreparacao_DeveDefinirStatusComoEmPreparacao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
 
             // Act
             pedido.ColocarPedidoEmPreparacao();
@@ -50,7 +135,27 @@ namespace Domain.Tests.Pedidos
         }
 
         [Fact]
-        public void ColocarPedidoComoRecebido_DeveDefinirStatusComoPago()
+        public void ColocarPedidoEmPreparacao_SeNaoEstiverRecebido_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoPronto();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser colocado em preparação, pois o mesmo não foi recebido", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoComoRecebido_DeveDefinirStatusComoRecebido()
         {
             // Arrange
             var pedido = pedidoFake();
@@ -62,10 +167,112 @@ namespace Domain.Tests.Pedidos
             Assert.Equal(PedidoStatus.Recebido, pedido.PedidoStatus);
         }
 
+        [Fact]
+        public void ColocarPedidoComoRecebido_SeJaEstiverCancelado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.CancelarPedido();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoRecebido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido já está cancelado", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoComoRecebido_SeJaEstiverPronto_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+            pedido.ColocarPedidoComoPronto();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoRecebido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser recebido, pois já está pronto", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoComoRecebido_SeJaEstiverEmPreparacao_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoRecebido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser recebido, pois já foi para preparação", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void FinalizarPedido_DeveDefinirStatusComoFinalizado()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+            pedido.ColocarPedidoComoPronto();
+
+            // Act
+            pedido.FinalizarPedido();
+
+            // Assert
+            Assert.Equal(PedidoStatus.Finalizado, pedido.PedidoStatus);
+        }
+
+        [Fact]
+        public void FinalizarPedido_SeNaoEstiverPronto_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+            pedido.ColocarPedidoEmPreparacao();
+
+            // Act
+            try
+            {
+                pedido.FinalizarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser finalizado, pois não está pronto", ex.Message);
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
         [Theory]
-        [InlineData(PedidoStatus.Rascunho)]
         [InlineData(PedidoStatus.Iniciado)]
-        [InlineData(PedidoStatus.Pago)]
         [InlineData(PedidoStatus.Cancelado)]
         [InlineData(PedidoStatus.Pronto)]
         [InlineData(PedidoStatus.EmPreparacao)]
@@ -75,6 +282,24 @@ namespace Domain.Tests.Pedidos
         {
             // Arrange
             var pedido = pedidoFake();
+
+            switch (novoStatus)
+            {
+                case PedidoStatus.Pronto:
+                    pedido.ColocarPedidoComoRecebido();
+                    pedido.ColocarPedidoEmPreparacao();
+                    break;
+                case PedidoStatus.EmPreparacao:
+                    pedido.ColocarPedidoComoRecebido();
+                    break;
+                case PedidoStatus.Finalizado:
+                    pedido.ColocarPedidoComoRecebido();
+                    pedido.ColocarPedidoEmPreparacao();
+                    pedido.ColocarPedidoComoPronto();
+                    break;
+                default:
+                    break;
+            }
 
             // Act
             pedido.AtualizarStatus(novoStatus);

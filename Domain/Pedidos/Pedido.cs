@@ -67,6 +67,14 @@ namespace Domain.Pedidos
             PedidoStatus = PedidoStatus.Recebido;
         }
 
+        public void FinalizarPedido()
+        {
+            if (PedidoStatus != PedidoStatus.Pronto)
+                throw new DomainException("Pedido não pode ser finalizado, pois não está pronto");
+
+            PedidoStatus = PedidoStatus.Finalizado;
+        }
+
         public void AtualizarStatus(PedidoStatus status)
         {
             switch (status)
@@ -82,6 +90,9 @@ namespace Domain.Pedidos
                     break;
                 case PedidoStatus.Recebido:
                     ColocarPedidoComoRecebido();
+                    break;
+                case PedidoStatus.Finalizado:
+                    FinalizarPedido();
                     break;
                 default:
                     throw new DomainException("Status do pedido inválido");

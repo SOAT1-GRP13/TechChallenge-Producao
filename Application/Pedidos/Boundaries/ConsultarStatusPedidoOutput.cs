@@ -8,7 +8,7 @@ namespace Application.Pedidos.Boundaries
     {
         public ConsultarStatusPedidoOutput()
         {
-            Status = PedidoStatus.Rascunho;
+            Status = PedidoStatus.Iniciado;
         }
 
         public ConsultarStatusPedidoOutput(PedidoStatus status, Guid pedidoId)

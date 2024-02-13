@@ -20,7 +20,7 @@ namespace Infra.Tests.Pedidos.Repository
 
             using (var context = new PedidosContext(options, mediatorHandler.Object))
             {
-                var pedidoObj = new Pedido(Guid.NewGuid(), 10);
+                var pedidoObj = pedidoFake();
                 context.Pedidos.Add(pedidoObj);
                 context.SaveChanges();
 
@@ -65,7 +65,7 @@ namespace Infra.Tests.Pedidos.Repository
                 .UseInMemoryDatabase(databaseName: "TestePedidoDbAtualizar")
                 .Options;
 
-            var pedido = new Pedido(Guid.NewGuid(), 10);
+            var pedido = pedidoFake();
             pedido.ColocarPedidoComoRecebido();
 
             // Criando e salvando o pedido original
@@ -118,8 +118,8 @@ namespace Infra.Tests.Pedidos.Repository
         {
             var context = CreateDbContext();
 
-            var pedido1 = new Pedido(Guid.NewGuid(), 100);
-            var pedido2 = new Pedido(Guid.NewGuid(), 150);
+            var pedido1 = pedidoFake();
+            var pedido2 = pedidoFake();
             context.Pedidos.Add(pedido1);
             context.Pedidos.Add(pedido2);
             await context.SaveChangesAsync();
@@ -138,13 +138,13 @@ namespace Infra.Tests.Pedidos.Repository
         {
             var context = CreateDbContext();
 
-            var pedido1 = new Pedido(Guid.NewGuid(), 100);
+            var pedido1 = pedidoFake();
             pedido1.ColocarPedidoComoRecebido();
-            var pedido2 = new Pedido(Guid.NewGuid(), 150);
+            var pedido2 = pedidoFake();
             pedido2.ColocarPedidoEmPreparacao();
-            var pedido4 = new Pedido(Guid.NewGuid(), 250);
+            var pedido4 = pedidoFake();
             pedido4.CancelarPedido();
-            var pedido5 = new Pedido(Guid.NewGuid(), 300);
+            var pedido5 = pedidoFake();
             pedido5.ColocarPedidoComoPronto();
             context.Pedidos.AddRange(pedido1, pedido2, pedido4, pedido5);
             await context.SaveChangesAsync();
@@ -171,6 +171,19 @@ namespace Infra.Tests.Pedidos.Repository
 
             return dbContext;
         }
+
+        private Pedido pedidoFake()
+        {
+            var item1 = new PedidoItem(Guid.NewGuid(), "Produto 1", 2);
+            var item2 = new PedidoItem(Guid.NewGuid(), "Produto 2", 3);
+
+            var itens = new List<PedidoItem> { item1, item2 };
+
+            var pedido = new Pedido(Guid.NewGuid(), itens);
+
+            return pedido;
+        }
         #endregion
+
     }
 }

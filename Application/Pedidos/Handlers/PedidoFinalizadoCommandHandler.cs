@@ -12,14 +12,14 @@ using Domain.Base.Messages.CommonMessages.Notifications;
 
 namespace Application.Pedidos.Handlers
 {
-    public class PedidoEmPreparacaoCommandHandler : IRequestHandler<PedidoEmPreparacaoCommand, PedidoDto?>
+    public class PedidoFinalizadoCommandHandler : IRequestHandler<PedidoFinalizadoCommand, PedidoDto?>
     {
         private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
         private readonly IRabbitMQService _rabbitMQService;
         private readonly IConfiguration _configuration;
 
-        public PedidoEmPreparacaoCommandHandler(
+        public PedidoFinalizadoCommandHandler(
             IPedidoUseCase statusPedidoUseCase,
             IMediatorHandler mediatorHandler,
             IRabbitMQService rabbitMQService,
@@ -32,7 +32,7 @@ namespace Application.Pedidos.Handlers
             _configuration = configuration;
         }
 
-        public async Task<PedidoDto?> Handle(PedidoEmPreparacaoCommand request, CancellationToken cancellationToken)
+        public async Task<PedidoDto?> Handle(PedidoFinalizadoCommand request, CancellationToken cancellationToken)
         {
             if (!request.EhValido())
             {
@@ -53,7 +53,7 @@ namespace Application.Pedidos.Handlers
                 }
 
                 string mensagem = JsonSerializer.Serialize(pedidoDto);
-                var fila = _configuration.GetSection("RabbitMQ:QueuePedidoPreparando").Value;
+                var fila = _configuration.GetSection("RabbitMQ:QueuePedidoFinalizado").Value;
                 _rabbitMQService.PublicaMensagem(fila, mensagem);
 
                 return pedidoDto;

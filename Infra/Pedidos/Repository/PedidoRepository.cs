@@ -41,7 +41,6 @@ namespace Infra.Pedidos.Repository
         {
             var pedido = await _context.Pedidos
                                        .Where(p => p.PedidoStatus != PedidoStatus.Finalizado
-                                                && p.PedidoStatus != PedidoStatus.Rascunho
                                                 && p.PedidoStatus != PedidoStatus.Cancelado
                                                 && p.PedidoStatus != PedidoStatus.Pronto)
                                        .Include(p => p.PedidoItems)

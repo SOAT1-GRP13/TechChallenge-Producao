@@ -1,16 +1,15 @@
-﻿using Application.Pedidos.Boundaries;
-using Application.Pedidos.Commands;
+﻿using Moq;
+using AutoMapper;
+using Domain.Pedidos;
 using Application.Pedidos.DTO;
+using Domain.Base.DomainObjects;
+using Application.Pedidos.Commands;
 using Application.Pedidos.Handlers;
 using Application.Pedidos.UseCases;
-using AutoMapper;
+using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using Domain.Pedidos;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
+
 
 namespace Application.Tests.Pedidos.Handlers
 {
@@ -26,37 +25,25 @@ namespace Application.Tests.Pedidos.Handlers
 
             var guid = Guid.NewGuid();
 
-            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput { IdPedido = guid, Status = 1 });
+            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput( guid, 1));
             var pedidoDto = new PedidoDto {
-                Id = guid,
-                Codigo = 1,
-                ValorTotal = 10,
+                PedidoId = guid,
+                ClienteId = Guid.NewGuid(),
                 DataCadastro = DateTime.Now,
-                PedidoStatus = PedidoStatus.Pago,
-            };
-
-            var pedidoOutput = new PedidoOutput
-            {
-                Id = guid,
-                Codigo = 1,
-                ValorTotal = 10,
-                DataCadastro = DateTime.Now,
-                PedidoStatus = PedidoStatus.Pago,
-                MercadoPagoId = 1
+                PedidoStatus = PedidoStatus.Iniciado,
             };
 
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(command.Input.IdPedido, (PedidoStatus)command.Input.Status)).ReturnsAsync(pedidoDto);
-            mapperMock.Setup(m => m.Map<PedidoOutput>(It.IsAny<PedidoDto>())).Returns(pedidoOutput);
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, mapperMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(command.Input.IdPedido, result.Id);
-            Assert.Equal(PedidoStatus.Pago, result.PedidoStatus);
+            Assert.Equal(command.Input.IdPedido, result?.PedidoId);
+            Assert.Equal(PedidoStatus.Iniciado, result?.PedidoStatus);
         }
 
         [Fact]
@@ -64,8 +51,9 @@ namespace Application.Tests.Pedidos.Handlers
         {
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
-            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput { IdPedido = Guid.Empty, Status = -1 }); // Dados inválidos
-            var handler = new AtualizarStatusPedidoCommandHandler(null, mediatorHandlerMock.Object, null); // As outras dependências não são necessárias para este teste
+            var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.Empty,-1 )); // Dados inválidos
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -81,12 +69,12 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
-            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput { IdPedido = Guid.NewGuid(), Status = 1 });
+            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.NewGuid(), 1));
 
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(command.Input.IdPedido, (PedidoStatus)command.Input.Status))
                 .ThrowsAsync(new DomainException("Erro de domínio simulado"));
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, null);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -101,14 +89,13 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
-            var mapperMock = new Mock<IMapper>();
-            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput { IdPedido = Guid.NewGuid(), Status = 1 });
+            var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.NewGuid(), 1));
             var notificationHandler = new DomainNotificationHandler();
 
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(command.Input.IdPedido, (PedidoStatus)command.Input.Status))
                 .ReturnsAsync(new PedidoDto()); // Pedido não encontrado
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, mapperMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
