@@ -26,6 +26,10 @@ namespace Infra.Pedidos.Repository
             return pedido;
         }
 
+        public void Adicionar(Pedido pedido)
+        {
+            _context.Pedidos.Add(pedido);
+        }
 
         public void Atualizar(Pedido pedido)
         {

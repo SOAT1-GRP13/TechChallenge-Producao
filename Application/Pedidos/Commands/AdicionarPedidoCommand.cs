@@ -5,18 +5,18 @@ using Application.Pedidos.Commands.Validation;
 
 namespace Application.Pedidos.Commands
 {
-    public class AtualizarStatusPedidoCommand : Command<PedidoDto?>
+    public class AdicionarPedidoCommand : Command<PedidoDto?>
     {
-        public AtualizarStatusPedidoInput Input { get; set; }
+        public AdicionarPedidoInput Input { get; set; }
 
-        public AtualizarStatusPedidoCommand(AtualizarStatusPedidoInput input)
+        public AdicionarPedidoCommand(AdicionarPedidoInput input)
         {
             Input = input;
         }
 
         public override bool EhValido()
         {
-            ValidationResult = new AtualizarStatusPedidoValidation().Validate(Input);
+            ValidationResult = new AdicionarPedidoValidation().Validate(Input);
             return ValidationResult.IsValid;
         }
     }

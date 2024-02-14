@@ -9,12 +9,12 @@ using Domain.Base.Messages.CommonMessages.Notifications;
 
 namespace Application.Pedidos.Handlers
 {
-    public class AtualizarStatusPedidoCommandHandler : IRequestHandler<AtualizarStatusPedidoCommand, PedidoDto?>
+    public class AdicionarPedidoCommandHandler : IRequestHandler<AdicionarPedidoCommand, PedidoDto?>
     {
         private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
 
-        public AtualizarStatusPedidoCommandHandler(
+        public AdicionarPedidoCommandHandler(
             IPedidoUseCase statusPedidoUseCase,
             IMediatorHandler mediatorHandler
         )
@@ -23,7 +23,7 @@ namespace Application.Pedidos.Handlers
             _mediatorHandler = mediatorHandler;
         }
 
-        public async Task<PedidoDto?> Handle(AtualizarStatusPedidoCommand request, CancellationToken cancellationToken)
+        public async Task<PedidoDto?> Handle(AdicionarPedidoCommand request, CancellationToken cancellationToken)
         {
             if (!request.EhValido())
             {
@@ -35,15 +35,15 @@ namespace Application.Pedidos.Handlers
             try
             {
                 var input = request.Input;
-                var pedidoDto = await _pedidoUseCase.TrocaStatusPedido(input.IdPedido, (PedidoStatus)input.Status);
+                var inserido = await _pedidoUseCase.AdicionarPedido(input.pedidoDto);
 
-                if (pedidoDto is null || pedidoDto.PedidoId == Guid.Empty)
+                if (!inserido)
                 {
-                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido não encontrado"));
+                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido não inserido"));
                     return null;
                 }
 
-                return pedidoDto;
+                return input.pedidoDto;
             }
             catch (DomainException ex)
             {

@@ -59,7 +59,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()));
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
             var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
 
             // Act
@@ -116,7 +116,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()));
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
             var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
 
             // Act
@@ -173,7 +173,7 @@ namespace API.Tests.Controllers
 
             var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(It.IsAny<AtualizarStatusPedidoCommand>()));
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
             var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
 
             // Act

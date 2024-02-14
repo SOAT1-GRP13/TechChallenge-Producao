@@ -23,6 +23,20 @@ namespace Application.Pedidos.UseCases
         #endregion
 
         #region Use Cases
+        public async Task<bool> AdicionarPedido(PedidoDto pedidoDto)
+        {
+            var pedido = _mapper.Map<Pedido>(pedidoDto);
+
+            if(pedido is null)
+                return false;
+
+            pedido.ColocarPedidoComoRecebido();
+
+            _pedidoRepository.Adicionar(pedido);
+
+            return await _pedidoRepository.UnitOfWork.Commit();
+        }
+
         public async Task<PedidoDto> TrocaStatusPedido(Guid idPedido, PedidoStatus novoStatus)
         {
             var pedido = await _pedidoRepository.ObterPorId(idPedido);
@@ -53,7 +67,5 @@ namespace Application.Pedidos.UseCases
             GC.SuppressFinalize(this);
             _pedidoRepository.Dispose();
         }
-
-
     }
 }
