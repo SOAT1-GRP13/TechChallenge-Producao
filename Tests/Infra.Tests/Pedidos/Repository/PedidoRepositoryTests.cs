@@ -56,6 +56,26 @@ namespace Infra.Tests.Pedidos.Repository
             }
         }
 
+        #region testes Adicionar
+        [Fact]
+        public async Task Adicionar_DeveAdicionarPedido_QuandoPedidoEhValido()
+        {
+            var context = CreateDbContext();
+
+            var pedido = pedidoFake();
+            var repository = new PedidoRepository(context);
+
+            // Ação
+            repository.Adicionar(pedido);
+            await context.SaveChangesAsync();
+
+            // Assertiva
+            var pedidoAdicionado = await context.Pedidos.FirstOrDefaultAsync(p => p.Id == pedido.Id);
+            Assert.NotNull(pedidoAdicionado);
+            Assert.Equal(pedido.ClienteId, pedidoAdicionado?.ClienteId);
+        }
+        #endregion
+
         [Fact]
         public async Task Atualizar_DeveAlterarDadosDoPedido_QuandoPedidoExiste()
         {
