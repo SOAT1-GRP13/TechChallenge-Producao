@@ -27,6 +27,7 @@ namespace API.Setup
             services.AddScoped<IPedidoUseCase, PedidoUseCase>();
             services.AddScoped<PedidosContext>();
 
+            services.AddScoped<IRequestHandler<AdicionarPedidoCommand, PedidoDto?>, AdicionarPedidoCommandHandler>();
             services.AddScoped<IRequestHandler<PedidoEmPreparacaoCommand, PedidoDto?>, PedidoEmPreparacaoCommandHandler>();
             services.AddScoped<IRequestHandler<PedidoProntoCommand, PedidoDto?>, PedidoProntoCommandHandler>();
             services.AddScoped<IRequestHandler<PedidoFinalizadoCommand, PedidoDto?>, PedidoFinalizadoCommandHandler>();
