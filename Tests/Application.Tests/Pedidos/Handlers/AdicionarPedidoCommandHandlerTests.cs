@@ -9,7 +9,6 @@ using Application.Pedidos.UseCases;
 using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using System;
 
 
 namespace Application.Tests.Pedidos.Handlers
