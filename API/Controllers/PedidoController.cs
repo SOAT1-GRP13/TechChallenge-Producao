@@ -25,7 +25,7 @@ namespace API.Controllers
         }
 
         [HttpPut("pedido-em-preparacao/{id}")]
-        [AllowAnonymous]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Colocar o pedido Em Preparacao",
             Description = "Atualiza o status do pedido para Em Preparação")]
@@ -45,7 +45,7 @@ namespace API.Controllers
         }
 
         [HttpPut("pedido-pronto/{id}")]
-        [AllowAnonymous]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Colocar o pedido pronto",
             Description = "Atualiza o status do pedido para Pronto")]
@@ -65,7 +65,7 @@ namespace API.Controllers
         }
 
         [HttpPut("pedido-finalizado/{id}")]
-        [AllowAnonymous]
+        [Authorize]
         [SwaggerOperation(
             Summary = "Colocar o pedido como finalizado",
             Description = "Atualiza o status do pedido para Finalizado")]
