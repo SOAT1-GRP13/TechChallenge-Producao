@@ -102,5 +102,7 @@ namespace API.Controllers
 
             return Ok(pedido);
         }
+
+        //TODO -> Implementar endpoint para consultar pedidos na fila
     }
 }
