@@ -54,7 +54,7 @@ namespace API.Controllers
         [SwaggerResponse(500, "Caso algo inesperado aconteça")]
         public async Task<IActionResult> PedidoPronto([FromRoute] Guid id)
         {
-            var input = new AtualizarStatusPedidoInput(id, (int)PedidoStatus.EmPreparacao);
+            var input = new AtualizarStatusPedidoInput(id, (int)PedidoStatus.Pronto);
             var command = new PedidoProntoCommand(input);
             var pedido = await _mediatorHandler.EnviarComando<PedidoProntoCommand, PedidoDto?>(command);
 
