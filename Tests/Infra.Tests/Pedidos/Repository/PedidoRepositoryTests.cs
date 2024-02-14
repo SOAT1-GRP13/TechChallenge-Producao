@@ -152,9 +152,9 @@ namespace Infra.Tests.Pedidos.Repository
         }
         #endregion
 
-        #region testes ObterPedidosParaFila
+        #region testes ObterPedidosParaFilaDeProducao
         [Fact]
-        public async Task ObterPedidosParaFila_DeveRetornarPedidosConformeStatus()
+        public async Task ObterPedidosParaFilaDeProducao_DeveRetornarPedidosConformeStatus()
         {
             var context = CreateDbContext();
 
@@ -173,12 +173,42 @@ namespace Infra.Tests.Pedidos.Repository
             await context.SaveChangesAsync();
 
             var repository = new PedidoRepository(context);
-            var pedidosParaFila = await repository.ObterPedidosParaFila();
+            var pedidosParaFila = await repository.ObterPedidosParaFilaDeProducao();
 
             Assert.Contains(pedidosParaFila, p => p.Id == pedido1.Id);
             Assert.Contains(pedidosParaFila, p => p.Id == pedido2.Id);
             Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido4.Id);
             Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido5.Id);
+        }
+        #endregion
+
+        #region testes ObterPedidosParaFilaDeExibicao
+        [Fact]
+        public async Task ObterPedidosParaFilaDeExibicao_DeveRetornarPedidosConformeStatus()
+        {
+            var context = CreateDbContext();
+
+            var pedido1 = pedidoFake();
+            pedido1.ColocarPedidoComoRecebido();
+            var pedido2 = pedidoFake();
+            pedido2.ColocarPedidoComoRecebido();
+            pedido2.ColocarPedidoEmPreparacao();
+            var pedido4 = pedidoFake();
+            pedido4.CancelarPedido();
+            var pedido5 = pedidoFake();
+            pedido5.ColocarPedidoComoRecebido();
+            pedido5.ColocarPedidoEmPreparacao();
+            pedido5.ColocarPedidoComoPronto();
+            context.Pedidos.AddRange(pedido1, pedido2, pedido4, pedido5);
+            await context.SaveChangesAsync();
+
+            var repository = new PedidoRepository(context);
+            var pedidosParaFila = await repository.ObterPedidosParaFilaDeExibicao();
+
+            Assert.Contains(pedidosParaFila, p => p.Id == pedido2.Id);
+            Assert.Contains(pedidosParaFila, p => p.Id == pedido5.Id);
+            Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido1.Id);
+            Assert.DoesNotContain(pedidosParaFila, p => p.Id == pedido4.Id);
         }
         #endregion
 

@@ -8,6 +8,7 @@ namespace Domain.Pedidos
         void Adicionar(Pedido pedido);
         void Atualizar(Pedido pedido);
         Task<IEnumerable<Pedido>> ObterTodosPedidos();
-        Task<IEnumerable<Pedido>> ObterPedidosParaFila();
+        Task<IEnumerable<Pedido>> ObterPedidosParaFilaDeProducao();
+        Task<IEnumerable<Pedido>> ObterPedidosParaFilaDeExibicao();
     }
 }
