@@ -103,6 +103,40 @@ namespace API.Controllers
             return Ok(pedido);
         }
 
-        //TODO -> Implementar endpoint para consultar pedidos na fila
+        [HttpGet("consultar-pedidos-fila-producao")]
+        [Authorize]
+        [SwaggerOperation(
+            Summary = "Consultar pedidos para fila de produção",
+            Description = "Consulta os pedidos para fila de produção")]
+        [SwaggerResponse(200, "Retorna os pedidos", typeof(IEnumerable<PedidoDto>))]
+        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
+        public async Task<IActionResult> ConsultarPedidosFilaProducao()
+        {
+            var command = new ConsultarPedidosFilaProducaoCommand();
+            var pedido = await _mediatorHandler.EnviarComando<ConsultarPedidosFilaProducaoCommand, IEnumerable<PedidoDto>>(command);
+
+            if (!OperacaoValida())
+                return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());
+
+            return Ok(pedido);
+        }
+
+        [HttpGet("consultar-pedidos-fila-cliente")]
+        [Authorize]
+        [SwaggerOperation(
+            Summary = "Consultar pedidos para fila de cliente",
+            Description = "Consulta os pedidos para fila de cliente")]
+        [SwaggerResponse(200, "Retorna os pedidos", typeof(IEnumerable<ConsultarPedidosFilaClienteOutput>))]
+        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
+        public async Task<IActionResult> ConsultarPedidosFilaCliente()
+        {
+            var command = new ConsultarPedidosFilaClienteCommand();
+            var pedido = await _mediatorHandler.EnviarComando<ConsultarPedidosFilaClienteCommand, IEnumerable<ConsultarPedidosFilaClienteOutput>>(command);
+
+            if (!OperacaoValida())
+                return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());
+
+            return Ok(pedido);
+        }
     }
 }

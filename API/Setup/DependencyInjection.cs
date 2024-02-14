@@ -32,6 +32,8 @@ namespace API.Setup
             services.AddScoped<IRequestHandler<PedidoProntoCommand, PedidoDto?>, PedidoProntoCommandHandler>();
             services.AddScoped<IRequestHandler<PedidoFinalizadoCommand, PedidoDto?>, PedidoFinalizadoCommandHandler>();
             services.AddScoped<IRequestHandler<ConsultarStatusPedidoCommand, ConsultarStatusPedidoOutput>, ConsultarStatusPedidoCommandHandler>();
+            services.AddScoped<IRequestHandler<ConsultarPedidosFilaProducaoCommand, IEnumerable<PedidoDto>>, ConsultarPedidosFilaProducaoCommandHandler>();
+            services.AddScoped<IRequestHandler<ConsultarPedidosFilaClienteCommand, IEnumerable<ConsultarPedidosFilaClienteOutput>>, ConsultarPedidosFilaClienteCommandHandler>();
         }
     }
 }

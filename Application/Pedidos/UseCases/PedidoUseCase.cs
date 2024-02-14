@@ -60,6 +60,20 @@ namespace Application.Pedidos.UseCases
             return _mapper.Map<PedidoDto>(pedido);
         }
 
+        public async Task<IEnumerable<PedidoDto>> ObterPedidosParaFilaDeProducao()
+        {
+            var pedidos = await _pedidoRepository.ObterPedidosParaFilaDeProducao();
+
+            return _mapper.Map<IEnumerable<PedidoDto>>(pedidos);
+        }
+
+        public async Task<IEnumerable<PedidoDto>> ObterPedidosParaFilaDeExibicao()
+        {
+            var pedidos = await _pedidoRepository.ObterPedidosParaFilaDeExibicao();
+
+            return _mapper.Map<IEnumerable<PedidoDto>>(pedidos);
+        }
+
         #endregion
 
         public void Dispose()
