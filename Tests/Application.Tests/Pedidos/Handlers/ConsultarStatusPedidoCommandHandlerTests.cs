@@ -30,7 +30,6 @@ namespace Application.Tests.Pedidos.Handlers
                 PedidoStatus = PedidoStatus.Iniciado,
             };
 
-            // Correção aqui: configurando corretamente o mock para o método ObterPedidoPorId
             pedidoUseCaseMock.Setup(p => p.ObterPedidoPorId(guid)).ReturnsAsync(pedidoDto);
 
             var handler = new ConsultarStatusPedidoCommandHandler(mediatorHandlerMock.Object, pedidoUseCaseMock.Object);
@@ -61,6 +60,31 @@ namespace Application.Tests.Pedidos.Handlers
             mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.AtLeastOnce());
             Assert.False(command.EhValido()); // Garante que o comando é inválido
         }
+
+        [Fact]
+        public async Task Handle_DevePublicarNotificacaoERetornarOutputVazio_QuandoPedidoNaoEncontrado()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var command = new ConsultarStatusPedidoCommand(guid);
+
+            pedidoUseCaseMock.Setup(p => p.ObterPedidoPorId(guid));
+
+            var handler = new ConsultarStatusPedidoCommandHandler(mediatorHandlerMock.Object, pedidoUseCaseMock.Object);
+
+            // Act
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.Is<DomainNotification>(dn => dn.Value == "Pedido não encontrado")), Times.Once());
+
+            Assert.NotNull(result);
+            Assert.Equal(default, result.PedidoId);
+            Assert.Equal(PedidoStatus.Iniciado, result.Status);
+        }
+
 
         [Fact]
         public async Task Handle_DevePublicarNotificacao_QuandoDomainExceptionLancada()
