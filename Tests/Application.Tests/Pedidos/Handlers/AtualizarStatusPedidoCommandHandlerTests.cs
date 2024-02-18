@@ -1,13 +1,11 @@
 ﻿using Moq;
 using Domain.Pedidos;
-using Domain.RabbitMQ;
 using Application.Pedidos.DTO;
 using Domain.Base.DomainObjects;
 using Application.Pedidos.Commands;
 using Application.Pedidos.UseCases;
 using Application.Pedidos.Handlers;
 using Application.Pedidos.Boundaries;
-using Microsoft.Extensions.Configuration;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
 
