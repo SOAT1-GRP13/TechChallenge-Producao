@@ -64,9 +64,9 @@ namespace Infra.RabbitMQ.Consumers
                     throw new Exception("Erro deserializar PedidoDto", ex);
                 }
 
-                var input = new AdicionarPedidoInput(pedidoPago);
-                var command = new AdicionarPedidoCommand(input);
-                mediatorHandler.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(command).Wait();
+                var input = new AtualizarStatusPedidoInput(pedidoPago.PedidoId, (int)PedidoStatus.Recebido);
+                var command = new AtualizarStatusPedidoCommand(input);
+                mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(command).Wait();
             }
         }
 

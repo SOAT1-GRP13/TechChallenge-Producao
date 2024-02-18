@@ -23,6 +23,14 @@ namespace Domain.Pedidos
             _pedidoItems = new List<PedidoItem>();
         }
 
+        public void IniciarPedido()
+        {
+            if (PedidoStatus != PedidoStatus.Iniciado)
+                throw new DomainException("Pedido já possui outro status");
+
+            PedidoStatus = PedidoStatus.Iniciado;
+        }
+
         public void CancelarPedido()
         {
             if (PedidoStatus == PedidoStatus.Cancelado)
@@ -42,8 +50,8 @@ namespace Domain.Pedidos
 
         public void RecusarPedido()
         {
-            if (PedidoStatus != PedidoStatus.Recebido)
-                throw new DomainException("Pedido não pode ser recusado, pois não foi recebido");
+            if (PedidoStatus != PedidoStatus.Iniciado)
+                throw new DomainException("Pedido não pode ser recusado, pois não estã com status de recebido");
 
             PedidoStatus = PedidoStatus.Recusado;
         }
