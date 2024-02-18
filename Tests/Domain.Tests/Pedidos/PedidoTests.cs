@@ -80,6 +80,29 @@ namespace Domain.Tests.Pedidos
         }
 
         [Fact]
+        public void CancelarPedido_SeJaEstiverRecusado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.IniciarPedido();
+            pedido.RecusarPedido();
+
+            // Act
+            try
+            {
+                pedido.CancelarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser cancelado, pois já foi recusado", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
         public void CancelarPedido_SeJaEstiverPronto_DeveLancarExcecao()
         {
             // Arrange
@@ -295,6 +318,29 @@ namespace Domain.Tests.Pedidos
             {
                 // Assert
                 Assert.Equal("Pedido já está cancelado", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+
+        [Fact]
+        public void ColocarPedidoComoRecebido_SeJaEstiverRecusado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.IniciarPedido();
+            pedido.RecusarPedido();
+
+            // Act
+            try
+            {
+                pedido.ColocarPedidoComoRecebido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser recebido, pois já foi recusado", ex.Message);
                 return;
             }
 

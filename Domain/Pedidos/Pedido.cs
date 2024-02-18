@@ -37,6 +37,9 @@ namespace Domain.Pedidos
             if (PedidoStatus == PedidoStatus.Cancelado)
                 throw new DomainException("Pedido já está cancelado");
 
+            if(PedidoStatus == PedidoStatus.Recusado)
+                throw new DomainException("Pedido não pode ser cancelado, pois já foi recusado");
+
             if(PedidoStatus == PedidoStatus.Pronto)
                 throw new DomainException("Pedido não pode ser cancelado, pois já está pronto");
 
@@ -77,6 +80,9 @@ namespace Domain.Pedidos
         {
             if (PedidoStatus == PedidoStatus.Cancelado)
                 throw new DomainException("Pedido já está cancelado");
+
+            if (PedidoStatus == PedidoStatus.Recusado)
+                throw new DomainException("Pedido não pode ser recebido, pois já foi recusado");
 
             if (PedidoStatus == PedidoStatus.Pronto)
                 throw new DomainException("Pedido não pode ser recebido, pois já está pronto");
