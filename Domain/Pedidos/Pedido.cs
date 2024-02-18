@@ -25,7 +25,7 @@ namespace Domain.Pedidos
 
         public void IniciarPedido()
         {
-            if (PedidoStatus != PedidoStatus.Iniciado)
+            if ((int)PedidoStatus > 1)
                 throw new DomainException("Pedido já possui outro status");
 
             PedidoStatus = PedidoStatus.Iniciado;
@@ -51,7 +51,7 @@ namespace Domain.Pedidos
         public void RecusarPedido()
         {
             if (PedidoStatus != PedidoStatus.Iniciado)
-                throw new DomainException("Pedido não pode ser recusado, pois não estã com status de recebido");
+                throw new DomainException("Pedido não pode ser recusado, pois não está com status de recebido");
 
             PedidoStatus = PedidoStatus.Recusado;
         }

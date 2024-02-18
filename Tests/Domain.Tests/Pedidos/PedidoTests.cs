@@ -120,7 +120,7 @@ namespace Domain.Tests.Pedidos
         {
             // Arrange
             var pedido = pedidoFake();
-            pedido.ColocarPedidoComoRecebido();
+            pedido.IniciarPedido();
 
             // Act
             pedido.RecusarPedido();
@@ -143,7 +143,7 @@ namespace Domain.Tests.Pedidos
             catch (DomainException ex)
             {
                 // Assert
-                Assert.Equal("Pedido não pode ser recusado, pois não foi recebido", ex.Message);
+                Assert.Equal("Pedido não pode ser recusado, pois não está com status de recebido", ex.Message);
                 return;
             }
 
