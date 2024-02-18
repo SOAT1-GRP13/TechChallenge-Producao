@@ -74,6 +74,7 @@ builder.Services.AddSingleton(serviceProvider =>
     return modelFactory.CreateModel();
 });
 builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+builder.Services.AddHostedService<PedidoConfirmadoSubscriber>();
 builder.Services.AddHostedService<PedidoPagoSubscriber>();
 
 builder.Services.RegisterServices();
