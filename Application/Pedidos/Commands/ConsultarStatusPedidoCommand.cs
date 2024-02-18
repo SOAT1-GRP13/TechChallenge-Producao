@@ -19,8 +19,4 @@ namespace Application.Pedidos.Commands
             return ValidationResult.IsValid;
         }
     }
-
-    public class ConfirmarStatusPedidoOutput
-    {
-    }
 }

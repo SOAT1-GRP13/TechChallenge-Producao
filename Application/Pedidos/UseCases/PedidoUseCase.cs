@@ -23,18 +23,26 @@ namespace Application.Pedidos.UseCases
         #endregion
 
         #region Use Cases
+        public async Task<bool> AdicionarPedido(PedidoDto pedidoDto)
+        {
+            var pedido = _mapper.Map<Pedido>(pedidoDto);
+
+            if(pedido is null)
+                return false;
+
+            pedido.ColocarPedidoComoRecebido();
+
+            _pedidoRepository.Adicionar(pedido);
+
+            return await _pedidoRepository.UnitOfWork.Commit();
+        }
+
         public async Task<PedidoDto> TrocaStatusPedido(Guid idPedido, PedidoStatus novoStatus)
         {
             var pedido = await _pedidoRepository.ObterPorId(idPedido);
 
             if (pedido is null)
                 return new PedidoDto();
-
-            switch (novoStatus)
-            {
-                case PedidoStatus.Iniciado:
-                    throw new DomainException("Não é permitido ir para esse status diretamente!");
-            }
 
             pedido.AtualizarStatus(novoStatus);
 
@@ -52,6 +60,20 @@ namespace Application.Pedidos.UseCases
             return _mapper.Map<PedidoDto>(pedido);
         }
 
+        public async Task<IEnumerable<PedidoDto>> ObterPedidosParaFilaDeProducao()
+        {
+            var pedidos = await _pedidoRepository.ObterPedidosParaFilaDeProducao();
+
+            return _mapper.Map<IEnumerable<PedidoDto>>(pedidos);
+        }
+
+        public async Task<IEnumerable<PedidoDto>> ObterPedidosParaFilaDeExibicao()
+        {
+            var pedidos = await _pedidoRepository.ObterPedidosParaFilaDeExibicao();
+
+            return _mapper.Map<IEnumerable<PedidoDto>>(pedidos);
+        }
+
         #endregion
 
         public void Dispose()
@@ -59,7 +81,5 @@ namespace Application.Pedidos.UseCases
             GC.SuppressFinalize(this);
             _pedidoRepository.Dispose();
         }
-
-
     }
 }

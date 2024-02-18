@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -6,6 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infra.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class InitialPedidos : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +19,6 @@ namespace Infra.Migrations
                     Codigo = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     ClienteId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ValorTotal = table.Column<decimal>(type: "numeric", nullable: false),
                     DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     PedidoStatus = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -35,8 +35,7 @@ namespace Infra.Migrations
                     PedidoId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProdutoId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProdutoNome = table.Column<string>(type: "varchar(250)", nullable: false),
-                    Quantidade = table.Column<int>(type: "integer", nullable: false),
-                    ValorUnitario = table.Column<decimal>(type: "numeric", nullable: false)
+                    Quantidade = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

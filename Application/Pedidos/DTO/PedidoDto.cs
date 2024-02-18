@@ -4,10 +4,11 @@ namespace Application.Pedidos.DTO
 {
     public class PedidoDto
     {
-        public Guid Id { get; set; }
-        public int Codigo { get; set; }
-        public decimal ValorTotal { get; set; }
+        public Guid PedidoId { get; set; }
+        public Guid ClienteId { get; set; }
         public DateTime DataCadastro { get; set; }
         public PedidoStatus PedidoStatus { get; set; }
+
+        public List<PedidoItemDto> Items { get; set; } = new List<PedidoItemDto>();
     }
 }

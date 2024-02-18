@@ -1,15 +1,10 @@
-﻿using Application.Pedidos.DTO;
-using Application.Pedidos.UseCases;
+﻿using Moq;
 using AutoMapper;
-using Domain.Base.Data;
-using Domain.Base.DomainObjects;
 using Domain.Pedidos;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Base.Data;
+using Application.Pedidos.DTO;
+using Domain.Base.DomainObjects;
+using Application.Pedidos.UseCases;
 
 namespace Application.Tests.Pedidos.UseCases
 {
@@ -35,7 +30,7 @@ namespace Application.Tests.Pedidos.UseCases
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            var pedido = new Pedido(pedidoId, false, 0, 100);
+            var pedido = pedidoFake();
             _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId)).ReturnsAsync(pedido);
 
             var pedidoDto = new PedidoDto();
@@ -44,7 +39,7 @@ namespace Application.Tests.Pedidos.UseCases
             _unitOfWorkMock.Setup(u => u.Commit()).ReturnsAsync(true);
 
             // Act
-            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Pago);
+            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Recebido);
 
             // Assert
             Assert.Equal(pedidoDto, resultado);
@@ -57,14 +52,14 @@ namespace Application.Tests.Pedidos.UseCases
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId)).ReturnsAsync((Pedido)null);
+            _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId));
 
             // Act
-            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Pago);
+            var resultado = await _pedidoUseCase.TrocaStatusPedido(pedidoId, PedidoStatus.Iniciado);
 
             // Assert
             Assert.NotNull(resultado);
-            Assert.Equal(Guid.Empty, resultado.Id);
+            Assert.Equal(Guid.Empty, resultado.PedidoId);
         }
 
         [Fact]
@@ -72,7 +67,7 @@ namespace Application.Tests.Pedidos.UseCases
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            var pedido = new Pedido(pedidoId, false, 0, 100);
+            var pedido = pedidoFake();
             _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId)).ReturnsAsync(pedido);
 
             // Act & Assert
@@ -85,10 +80,10 @@ namespace Application.Tests.Pedidos.UseCases
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            var pedido = new Pedido(pedidoId, false, 0, 100);
+            var pedido = pedidoFake();
             _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId)).ReturnsAsync(pedido);
 
-            var pedidoDto = new PedidoDto { Id = pedidoId };
+            var pedidoDto = new PedidoDto { PedidoId = pedidoId };
             _mapperMock.Setup(m => m.Map<PedidoDto>(pedido)).Returns(pedidoDto);
 
             // Act
@@ -96,7 +91,7 @@ namespace Application.Tests.Pedidos.UseCases
 
             // Assert
             Assert.NotNull(resultado);
-            Assert.Equal(pedidoId, resultado.Id);
+            Assert.Equal(pedidoId, resultado.PedidoId);
             _mapperMock.Verify(m => m.Map<PedidoDto>(pedido), Times.Once());
         }
 
@@ -105,7 +100,7 @@ namespace Application.Tests.Pedidos.UseCases
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId)).ReturnsAsync((Pedido)null);
+            _pedidoRepositoryMock.Setup(r => r.ObterPorId(pedidoId));
 
             // Act
             var resultado = await _pedidoUseCase.ObterPedidoPorId(pedidoId);
@@ -123,5 +118,19 @@ namespace Application.Tests.Pedidos.UseCases
             // Assert
             _pedidoRepositoryMock.Verify(r => r.Dispose(), Times.Once());
         }
+
+        #region Metodos privados
+        private Pedido pedidoFake()
+        {
+            var item1 = new PedidoItem(Guid.NewGuid(), "Produto 1", 2);
+            var item2 = new PedidoItem(Guid.NewGuid(), "Produto 2", 3);
+
+            var itens = new List<PedidoItem> { item1, item2 };
+
+            var pedido = new Pedido(Guid.NewGuid(), itens);
+
+            return pedido;
+        }
+        #endregion
     }
 }

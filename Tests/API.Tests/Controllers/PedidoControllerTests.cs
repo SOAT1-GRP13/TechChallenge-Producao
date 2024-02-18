@@ -8,14 +8,15 @@ using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Base.Messages.CommonMessages.Notifications;
+using Application.Pedidos.DTO;
 
 namespace API.Tests.Controllers
 {
     public class PedidoControllerTests
     {
-        #region Testes metodo AtualizarStatusPedido
+        #region Testes metodo PedidoEmPreparacao
         [Fact]
-        public async Task AoAtualizarStatusPedido_DeveRetornarOk_QuandoSucesso()
+        public async Task AoPedidoEmPreparacao_DeveRetornarOk_QuandoSucesso()
         {
             // Arrange
             var serviceProvider = new ServiceCollection()
@@ -26,36 +27,24 @@ namespace API.Tests.Controllers
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var domainNotificationHandler = serviceProvider.GetRequiredService<INotificationHandler<DomainNotification>>();
 
-            var input = new AtualizarStatusPedidoInput { 
-                IdPedido = Guid.NewGuid(), 
-                Status = 1 
-            };
+            var pedidoDto = pedidoDtoFake();
 
-            var output = new PedidoOutput { 
-                Id = input.IdPedido, 
-                Codigo = 1,
-                ValorTotal = 10,
-                DataCadastro = DateTime.Now,
-                PedidoStatus = (PedidoStatus)input.Status,
-                MercadoPagoId = 1
-            };
-
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoOutput>(It.IsAny<AtualizarStatusPedidoCommand>()))
-            .ReturnsAsync(output);
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoEmPreparacaoCommand, PedidoDto?>(It.IsAny<PedidoEmPreparacaoCommand>()))
+            .ReturnsAsync(pedidoDto);
 
             var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);
 
             // Act
-            var result = await controller.AtualizarStatusPedido(input);
+            var result = await controller.PedidoEmPreparacao(pedidoDto.PedidoId);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<PedidoOutput>(okResult.Value);
-            Assert.Equal(output.Id, returnValue.Id);
+            var returnValue = Assert.IsType<PedidoDto?>(okResult.Value);
+            Assert.Equal(pedidoDto.PedidoId, returnValue?.PedidoId);
         }
 
         [Fact]
-        public async Task AoAtualizarStatusPedido_DeveRetornarBadRequest_QuandoFalha()
+        public async Task AoPedidoEmPreparacao_DeveRetornarBadRequest_QuandoFalha()
         {
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
@@ -65,17 +54,130 @@ namespace API.Tests.Controllers
 
             foreach (var n in notifications)
             {
-                notificationContext.Handle(n, CancellationToken.None);
+                await notificationContext.Handle(n, CancellationToken.None);
             }
 
-            var input = new AtualizarStatusPedidoInput { IdPedido = Guid.NewGuid(), Status = 1 };
+            var pedidoDto = pedidoDtoFake();
 
-            mediatorHandlerMock.Setup(m => m.EnviarComando<AtualizarStatusPedidoCommand, PedidoOutput>(It.IsAny<AtualizarStatusPedidoCommand>()))
-                               .ReturnsAsync((PedidoOutput)null);
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
             var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
 
             // Act
-            var result = await controller.AtualizarStatusPedido(input);
+            var result = await controller.PedidoEmPreparacao(pedidoDto.PedidoId);
+
+            // Assert
+            var badRequestResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(400, badRequestResult.StatusCode);
+        }
+        #endregion
+
+        #region Testes metodo PedidoPronto
+        [Fact]
+        public async Task AoPedidoPronto_DeveRetornarOk_QuandoSucesso()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+               .AddScoped<IMediatorHandler, MediatorHandler>()
+               .AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>()
+               .BuildServiceProvider();
+
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = serviceProvider.GetRequiredService<INotificationHandler<DomainNotification>>();
+
+            var pedidoDto = pedidoDtoFake();
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoProntoCommand, PedidoDto?>(It.IsAny<PedidoProntoCommand>()))
+            .ReturnsAsync(pedidoDto);
+
+            var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);
+
+            // Act
+            var result = await controller.PedidoPronto(pedidoDto.PedidoId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnValue = Assert.IsType<PedidoDto?>(okResult.Value);
+            Assert.Equal(pedidoDto.PedidoId, returnValue?.PedidoId);
+        }
+
+        [Fact]
+        public async Task AoPedidoPronto_DeveRetornarBadRequest_QuandoFalha()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var notificationHandlerMock = new Mock<INotificationHandler<DomainNotification>>();
+            var notifications = new List<DomainNotification> { new DomainNotification("Error", "Erro de validação") };
+            var notificationContext = new DomainNotificationHandler();
+
+            foreach (var n in notifications)
+            {
+                await notificationContext.Handle(n, CancellationToken.None);
+            }
+
+            var pedidoDto = pedidoDtoFake();
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
+            var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
+
+            // Act
+            var result = await controller.PedidoPronto(pedidoDto.PedidoId);
+
+            // Assert
+            var badRequestResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(400, badRequestResult.StatusCode);
+        }
+        #endregion
+
+        #region Testes metodo PedidoFinalizado
+        [Fact]
+        public async Task AoPedidoFinalizado_DeveRetornarOk_QuandoSucesso()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+               .AddScoped<IMediatorHandler, MediatorHandler>()
+               .AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>()
+               .BuildServiceProvider();
+
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = serviceProvider.GetRequiredService<INotificationHandler<DomainNotification>>();
+
+            var pedidoDto = pedidoDtoFake();
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<PedidoFinalizadoCommand, PedidoDto?>(It.IsAny<PedidoFinalizadoCommand>()))
+            .ReturnsAsync(pedidoDto);
+
+            var controller = new PedidoController(domainNotificationHandler, mediatorHandlerMock.Object);
+
+            // Act
+            var result = await controller.PedidoFinalizado(pedidoDto.PedidoId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnValue = Assert.IsType<PedidoDto?>(okResult.Value);
+            Assert.Equal(pedidoDto.PedidoId, returnValue?.PedidoId);
+        }
+
+        [Fact]
+        public async Task AoPedidoFinalizado_DeveRetornarBadRequest_QuandoFalha()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var notificationHandlerMock = new Mock<INotificationHandler<DomainNotification>>();
+            var notifications = new List<DomainNotification> { new DomainNotification("Error", "Erro de validação") };
+            var notificationContext = new DomainNotificationHandler();
+
+            foreach (var n in notifications)
+            {
+                await notificationContext.Handle(n, CancellationToken.None);
+            }
+
+            var pedidoDto = pedidoDtoFake();
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(It.IsAny<AdicionarPedidoCommand>()));
+            var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
+
+            // Act
+            var result = await controller.PedidoFinalizado(pedidoDto.PedidoId);
 
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
@@ -96,7 +198,7 @@ namespace API.Tests.Controllers
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var domainNotificationHandler = serviceProvider.GetRequiredService<INotificationHandler<DomainNotification>>();
             var pedidoId = Guid.NewGuid();
-            var output = new ConsultarStatusPedidoOutput(PedidoStatus.Pago, pedidoId);
+            var output = new ConsultarStatusPedidoOutput(PedidoStatus.Iniciado, pedidoId);
 
             mediatorHandlerMock.Setup(m => m.EnviarComando<ConsultarStatusPedidoCommand, ConsultarStatusPedidoOutput>(It.IsAny<ConsultarStatusPedidoCommand>()))
                 .ReturnsAsync(output);
@@ -123,7 +225,7 @@ namespace API.Tests.Controllers
 
             foreach (var n in notifications)
             {
-                notificationContext.Handle(n, CancellationToken.None);
+                await notificationContext.Handle(n, CancellationToken.None);
             }
 
             var controller = new PedidoController(notificationContext, mediatorHandlerMock.Object);
@@ -138,6 +240,32 @@ namespace API.Tests.Controllers
             Assert.Equal(400, badRequestResult.StatusCode);
         }
 
+        #endregion
+
+        #region Metodos privados
+        private PedidoDto pedidoDtoFake()
+        {
+            var item1 = new PedidoItemDto();
+            item1.ProdutoId = Guid.NewGuid();
+            item1.ProdutoNome = "Produto 1";
+            item1.Quantidade = 2;
+
+            var item2 = new PedidoItemDto();
+            item2.ProdutoId = Guid.NewGuid();
+            item2.ProdutoNome = "Produto 2";
+            item2.Quantidade = 3;
+
+            var itens = new List<PedidoItemDto> { item1, item2 };
+
+            var pedido = new PedidoDto();
+            pedido.PedidoId = Guid.NewGuid();
+            pedido.ClienteId = Guid.NewGuid();
+            pedido.DataCadastro = DateTime.Now;
+            pedido.PedidoStatus = PedidoStatus.Iniciado;
+            pedido.Items = itens;
+
+            return pedido;
+        }
         #endregion
     }
 }

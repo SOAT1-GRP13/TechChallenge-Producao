@@ -6,18 +6,16 @@ namespace Domain.Pedidos
     {
         public int Codigo { get; private set; }
         public Guid ClienteId { get; private set; }
-        public decimal ValorTotal { get; private set; }
         public DateTime DataCadastro { get; private set; }
         public PedidoStatus PedidoStatus { get; private set; }
 
         private readonly List<PedidoItem> _pedidoItems;
         public IReadOnlyCollection<PedidoItem> PedidoItems => _pedidoItems;
 
-        public Pedido(Guid clienteId, bool cupomUtilizado, decimal desconto, decimal valorTotal)
+        public Pedido(Guid clienteId, List<PedidoItem> pedidoItems)
         {
             ClienteId = clienteId;
-            ValorTotal = valorTotal;
-            _pedidoItems = new List<PedidoItem>();
+            _pedidoItems = pedidoItems;
         }
 
         protected Pedido()
@@ -25,109 +23,61 @@ namespace Domain.Pedidos
             _pedidoItems = new List<PedidoItem>();
         }
 
-
-        public void CalcularValorPedido()
-        {
-            ValorTotal = PedidoItems.Sum(p => p.CalcularValor());
-        }
-
-
-        public bool PedidoItemExistente(PedidoItem item)
-        {
-            return _pedidoItems.Any(p => p.ProdutoId == item.ProdutoId);
-        }
-
-        public void AdicionarItem(PedidoItem item)
-        {
-            if (!item.EhValido()) return;
-
-            item.AssociarPedido(Id);
-
-            if (PedidoItemExistente(item))
-            {
-                var itemExistente = _pedidoItems.First(p => p.ProdutoId == item.ProdutoId);
-                itemExistente.AdicionarUnidades(item.Quantidade);
-                item = itemExistente;
-
-                _pedidoItems.Remove(itemExistente);
-            }
-
-            item.CalcularValor();
-            _pedidoItems.Add(item);
-
-            CalcularValorPedido();
-        }
-
-        public void RemoverItem(PedidoItem item)
-        {
-            if (!item.EhValido()) return;
-
-            var itemExistente = PedidoItems.FirstOrDefault(p => p.ProdutoId == item.ProdutoId);
-
-            if (itemExistente == null) throw new DomainException("O item não pertence ao pedido");
-            _pedidoItems.Remove(itemExistente);
-
-            CalcularValorPedido();
-        }
-
-        public void AtualizarItem(PedidoItem item)
-        {
-            if (!item.EhValido()) return;
-            item.AssociarPedido(Id);
-
-            var itemExistente = PedidoItems.FirstOrDefault(p => p.ProdutoId == item.ProdutoId);
-
-            if (itemExistente == null) throw new DomainException("O item não pertence ao pedido");
-
-            _pedidoItems.Remove(itemExistente);
-            _pedidoItems.Add(item);
-
-            CalcularValorPedido();
-        }
-
-        public void AtualizarUnidades(PedidoItem item, int unidades)
-        {
-            item.AtualizarUnidades(unidades);
-            AtualizarItem(item);
-        }
-
-        public void TornarRascunho()
-        {
-            PedidoStatus = PedidoStatus.Rascunho;
-        }
-
-        public void IniciarPedido()
-        {
-            PedidoStatus = PedidoStatus.Iniciado;
-        }
-
-        public void ColocarPedidoComoPago()
-        {
-            PedidoStatus = PedidoStatus.Pago;
-        }
-
         public void CancelarPedido()
         {
+            if (PedidoStatus == PedidoStatus.Cancelado)
+                throw new DomainException("Pedido já está cancelado");
+
+            if(PedidoStatus == PedidoStatus.Pronto)
+                throw new DomainException("Pedido não pode ser cancelado, pois já está pronto");
+
+            if (PedidoStatus == PedidoStatus.EmPreparacao)
+                throw new DomainException("Pedido não pode ser cancelado, pois já foi para preparação");
+
+            if (PedidoStatus == PedidoStatus.Finalizado)
+                throw new DomainException("Pedido já foi finalizado");
+
             PedidoStatus = PedidoStatus.Cancelado;
         }
 
         public void ColocarPedidoComoPronto()
         {
+            if (PedidoStatus != PedidoStatus.EmPreparacao)
+                throw new DomainException("Pedido não pode ser colocado como pronto, pois o mesmo não está em preparação");
+
             PedidoStatus = PedidoStatus.Pronto;
         }
 
         public void ColocarPedidoEmPreparacao()
         {
+            if (PedidoStatus != PedidoStatus.Recebido)
+                throw new DomainException("Pedido não pode ser colocado em preparação, pois o mesmo não foi recebido");
+
             PedidoStatus = PedidoStatus.EmPreparacao;
         }
 
         public void ColocarPedidoComoRecebido()
         {
+            if (PedidoStatus == PedidoStatus.Cancelado)
+                throw new DomainException("Pedido já está cancelado");
+
+            if (PedidoStatus == PedidoStatus.Pronto)
+                throw new DomainException("Pedido não pode ser recebido, pois já está pronto");
+
+            if (PedidoStatus == PedidoStatus.EmPreparacao)
+                throw new DomainException("Pedido não pode ser recebido, pois já foi para preparação");
+
+            if (PedidoStatus == PedidoStatus.Finalizado)
+                throw new DomainException("Pedido já foi finalizado");
+
             PedidoStatus = PedidoStatus.Recebido;
         }
 
         public void FinalizarPedido()
         {
+            if (PedidoStatus != PedidoStatus.Pronto)
+                throw new DomainException("Pedido não pode ser finalizado, pois não está pronto");
+
             PedidoStatus = PedidoStatus.Finalizado;
         }
 
@@ -135,15 +85,6 @@ namespace Domain.Pedidos
         {
             switch (status)
             {
-                case PedidoStatus.Rascunho:
-                    TornarRascunho();
-                    break;
-                case PedidoStatus.Iniciado:
-                    IniciarPedido();
-                    break;
-                case PedidoStatus.Pago:
-                    ColocarPedidoComoPago();
-                    break;
                 case PedidoStatus.Cancelado:
                     CancelarPedido();
                     break;
@@ -161,20 +102,6 @@ namespace Domain.Pedidos
                     break;
                 default:
                     throw new DomainException("Status do pedido inválido");
-            }
-        }
-
-        public static class PedidoFactory
-        {
-            public static Pedido NovoPedidoRascunho(Guid clienteId)
-            {
-                var pedido = new Pedido
-                {
-                    ClienteId = clienteId, // TODO - Caso o cliente não se identifique usar algum código de cliente anônimo.
-                };
-
-                pedido.TornarRascunho();
-                return pedido;
             }
         }
     }
