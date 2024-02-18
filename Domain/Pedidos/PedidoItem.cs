@@ -12,21 +12,12 @@ namespace Domain.Pedidos
         // Entity Relacionamento.
         public Pedido? Pedido { get; set; }
 
-        public PedidoItem(Guid produtoId, string produtoNome, int quantidade)
+        public PedidoItem(Guid pedidoId, Guid produtoId, string produtoNome, int quantidade)
         {
+            PedidoId = pedidoId;
             ProdutoId = produtoId;
             ProdutoNome = produtoNome;
             Quantidade = quantidade;
-        }
-
-        internal void AssociarPedido(Guid pedidoId)
-        {
-            PedidoId = pedidoId;
-        }
-
-        public override bool EhValido()
-        {
-            return true;
         }
     }
 }

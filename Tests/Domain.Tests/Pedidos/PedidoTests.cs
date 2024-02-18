@@ -5,6 +5,44 @@ namespace Domain.Tests.Pedidos
 {
     public class PedidoTests
     {
+        #region IniciarPedido
+        [Fact]
+        public void IniciarPedido_DeveDefinirStatusComoIniciado()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+
+            // Act
+            pedido.IniciarPedido();
+
+            // Assert
+            Assert.Equal(PedidoStatus.Iniciado, pedido.PedidoStatus);
+        }
+
+        [Fact]
+        public void IniciarPedido_SeJaEstiverIniciado_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.IniciarPedido();
+            pedido.ColocarPedidoComoRecebido();
+
+            // Act
+            try
+            {
+                pedido.IniciarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido já possui outro status", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+        #endregion
+
         #region CancelarPedido
         [Fact]
         public void CancelarPedido_DeveDefinirStatusComoCancelado()
@@ -383,6 +421,7 @@ namespace Domain.Tests.Pedidos
         [InlineData(PedidoStatus.EmPreparacao)]
         [InlineData(PedidoStatus.Recebido)]
         [InlineData(PedidoStatus.Finalizado)]
+        [InlineData(PedidoStatus.Recusado)]
         public void AtualizarStatus_DeveDefinirStatusCorreto(PedidoStatus novoStatus)
         {
             // Arrange
@@ -401,6 +440,9 @@ namespace Domain.Tests.Pedidos
                     pedido.ColocarPedidoComoRecebido();
                     pedido.ColocarPedidoEmPreparacao();
                     pedido.ColocarPedidoComoPronto();
+                    break;
+                case PedidoStatus.Recusado:
+                    pedido.IniciarPedido();
                     break;
                 default:
                     break;
@@ -428,8 +470,12 @@ namespace Domain.Tests.Pedidos
         #region Metodos privados
         private Pedido pedidoFake()
         {
-            var item1 = new PedidoItem(Guid.NewGuid(), "Produto 1", 2);
-            var item2 = new PedidoItem(Guid.NewGuid(), "Produto 2", 3);
+            var pedidoId = Guid.NewGuid();
+
+            var item1 = new PedidoItem(pedidoId, Guid.NewGuid(), "Produto 1", 2);
+            item1.Pedido = null;
+            var item2 = new PedidoItem(pedidoId, Guid.NewGuid(), "Produto 2", 3);
+            item2.Pedido = null;
 
             var itens = new List<PedidoItem> { item1, item2 };
 

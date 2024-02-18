@@ -15,6 +15,7 @@ namespace Domain.Pedidos
         public Pedido(Guid clienteId, List<PedidoItem> pedidoItems)
         {
             ClienteId = clienteId;
+            Codigo = 0;
             _pedidoItems = pedidoItems;
         }
 
