@@ -164,7 +164,8 @@ namespace Infra.Tests.Pedidos.Repository
             pedido2.ColocarPedidoComoRecebido();
             pedido2.ColocarPedidoEmPreparacao();
             var pedido4 = pedidoFake();
-            pedido4.CancelarPedido();
+            pedido4.IniciarPedido();
+            pedido4.RecusarPedido();
             var pedido5 = pedidoFake();
             pedido5.ColocarPedidoComoRecebido();
             pedido5.ColocarPedidoEmPreparacao();
@@ -194,7 +195,8 @@ namespace Infra.Tests.Pedidos.Repository
             pedido2.ColocarPedidoComoRecebido();
             pedido2.ColocarPedidoEmPreparacao();
             var pedido4 = pedidoFake();
-            pedido4.CancelarPedido();
+            pedido4.IniciarPedido();
+            pedido4.RecusarPedido();
             var pedido5 = pedidoFake();
             pedido5.ColocarPedidoComoRecebido();
             pedido5.ColocarPedidoEmPreparacao();

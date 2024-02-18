@@ -43,138 +43,6 @@ namespace Domain.Tests.Pedidos
         }
         #endregion
 
-        #region CancelarPedido
-        [Fact]
-        public void CancelarPedido_DeveDefinirStatusComoCancelado()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-
-            // Act
-            pedido.CancelarPedido();
-
-            // Assert
-            Assert.Equal(PedidoStatus.Cancelado, pedido.PedidoStatus);
-        }
-
-        [Fact]
-        public void CancelarPedido_SeJaEstiverCancelado_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.CancelarPedido();
-
-            // Act
-            try 
-            {
-                pedido.CancelarPedido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido já está cancelado", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
-        }
-
-        [Fact]
-        public void CancelarPedido_SeJaEstiverRecusado_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.IniciarPedido();
-            pedido.RecusarPedido();
-
-            // Act
-            try
-            {
-                pedido.CancelarPedido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido não pode ser cancelado, pois já foi recusado", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
-        }
-
-        [Fact]
-        public void CancelarPedido_SeJaEstiverPronto_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.ColocarPedidoComoRecebido();
-            pedido.ColocarPedidoEmPreparacao();
-            pedido.ColocarPedidoComoPronto();
-
-            // Act
-            try
-            {
-                pedido.CancelarPedido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido não pode ser cancelado, pois já está pronto", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
-        }
-
-        [Fact]
-        public void CancelarPedido_SeJaEstiverEmPreparacao_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.ColocarPedidoComoRecebido();
-            pedido.ColocarPedidoEmPreparacao();
-
-            // Act
-            try
-            {
-                pedido.CancelarPedido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido não pode ser cancelado, pois já foi para preparação", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
-        }
-
-        [Fact]
-        public void CancelarPedido_SeJaEstiverFinalizado_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.ColocarPedidoComoRecebido();
-            pedido.ColocarPedidoEmPreparacao();
-            pedido.ColocarPedidoComoPronto();
-            pedido.FinalizarPedido();
-
-            // Act
-            try
-            {
-                pedido.CancelarPedido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido já foi finalizado", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
-        }
-        #endregion
-
         #region RecusarPedido
         [Fact]
         public void RecusarPedido_DeveDefinirStatusComoRecusado()
@@ -300,28 +168,6 @@ namespace Domain.Tests.Pedidos
 
             // Assert
             Assert.Equal(PedidoStatus.Recebido, pedido.PedidoStatus);
-        }
-
-        [Fact]
-        public void ColocarPedidoComoRecebido_SeJaEstiverCancelado_DeveLancarExcecao()
-        {
-            // Arrange
-            var pedido = pedidoFake();
-            pedido.CancelarPedido();
-
-            // Act
-            try
-            {
-                pedido.ColocarPedidoComoRecebido();
-            }
-            catch (DomainException ex)
-            {
-                // Assert
-                Assert.Equal("Pedido já está cancelado", ex.Message);
-                return;
-            }
-
-            Assert.True(false, "Deveria ter lançado exceção");
         }
 
         [Fact]
@@ -462,7 +308,6 @@ namespace Domain.Tests.Pedidos
         #endregion
 
         [Theory]
-        [InlineData(PedidoStatus.Cancelado)]
         [InlineData(PedidoStatus.Pronto)]
         [InlineData(PedidoStatus.EmPreparacao)]
         [InlineData(PedidoStatus.Recebido)]
