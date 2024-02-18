@@ -45,7 +45,7 @@ namespace Infra.Pedidos.Repository
         {
             var pedido = await _context.Pedidos
                                        .Where(p => p.PedidoStatus != PedidoStatus.Finalizado
-                                                && p.PedidoStatus != PedidoStatus.Cancelado
+                                                && p.PedidoStatus != PedidoStatus.Recusado
                                                 && p.PedidoStatus != PedidoStatus.Pronto)
                                        .Include(p => p.PedidoItems)
                                        .OrderBy(p => p.DataCadastro)
@@ -60,7 +60,7 @@ namespace Infra.Pedidos.Repository
             var pedido = await _context.Pedidos
                                        .Where(p => p.PedidoStatus != PedidoStatus.Recebido
                                                 && p.PedidoStatus != PedidoStatus.Finalizado
-                                                && p.PedidoStatus != PedidoStatus.Cancelado)
+                                                && p.PedidoStatus != PedidoStatus.Recusado)
                                        .Include(p => p.PedidoItems)
                                        .OrderBy(p => p.DataCadastro)
                                        .OrderBy(p => p.PedidoStatus)

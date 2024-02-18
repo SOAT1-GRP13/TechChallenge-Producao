@@ -32,26 +32,6 @@ namespace Domain.Pedidos
             PedidoStatus = PedidoStatus.Iniciado;
         }
 
-        public void CancelarPedido()
-        {
-            if (PedidoStatus == PedidoStatus.Cancelado)
-                throw new DomainException("Pedido já está cancelado");
-
-            if(PedidoStatus == PedidoStatus.Recusado)
-                throw new DomainException("Pedido não pode ser cancelado, pois já foi recusado");
-
-            if(PedidoStatus == PedidoStatus.Pronto)
-                throw new DomainException("Pedido não pode ser cancelado, pois já está pronto");
-
-            if (PedidoStatus == PedidoStatus.EmPreparacao)
-                throw new DomainException("Pedido não pode ser cancelado, pois já foi para preparação");
-
-            if (PedidoStatus == PedidoStatus.Finalizado)
-                throw new DomainException("Pedido já foi finalizado");
-
-            PedidoStatus = PedidoStatus.Cancelado;
-        }
-
         public void RecusarPedido()
         {
             if (PedidoStatus != PedidoStatus.Iniciado)
@@ -78,9 +58,6 @@ namespace Domain.Pedidos
 
         public void ColocarPedidoComoRecebido()
         {
-            if (PedidoStatus == PedidoStatus.Cancelado)
-                throw new DomainException("Pedido já está cancelado");
-
             if (PedidoStatus == PedidoStatus.Recusado)
                 throw new DomainException("Pedido não pode ser recebido, pois já foi recusado");
 
@@ -108,9 +85,6 @@ namespace Domain.Pedidos
         {
             switch (status)
             {
-                case PedidoStatus.Cancelado:
-                    CancelarPedido();
-                    break;
                 case PedidoStatus.Pronto:
                     ColocarPedidoComoPronto();
                     break;
