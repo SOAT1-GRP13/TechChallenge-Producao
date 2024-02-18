@@ -40,6 +40,14 @@ namespace Domain.Pedidos
             PedidoStatus = PedidoStatus.Cancelado;
         }
 
+        public void RecusarPedido()
+        {
+            if (PedidoStatus != PedidoStatus.Recebido)
+                throw new DomainException("Pedido não pode ser recusado, pois não foi recebido");
+
+            PedidoStatus = PedidoStatus.Recusado;
+        }
+
         public void ColocarPedidoComoPronto()
         {
             if (PedidoStatus != PedidoStatus.EmPreparacao)
@@ -99,6 +107,9 @@ namespace Domain.Pedidos
                     break;
                 case PedidoStatus.Finalizado:
                     FinalizarPedido();
+                    break;
+                case PedidoStatus.Recusado:
+                    RecusarPedido();
                     break;
                 default:
                     throw new DomainException("Status do pedido inválido");

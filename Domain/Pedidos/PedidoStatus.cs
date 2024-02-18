@@ -7,6 +7,7 @@
         Pronto = 4,
         EmPreparacao = 5,
         Recebido = 6,
-        Finalizado = 7
+        Finalizado = 7,
+        Recusado = 8
     }
 }

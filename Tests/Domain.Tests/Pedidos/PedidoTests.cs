@@ -114,6 +114,43 @@ namespace Domain.Tests.Pedidos
         }
         #endregion
 
+        #region RecusarPedido
+        [Fact]
+        public void RecusarPedido_DeveDefinirStatusComoRecusado()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+            pedido.ColocarPedidoComoRecebido();
+
+            // Act
+            pedido.RecusarPedido();
+
+            // Assert
+            Assert.Equal(PedidoStatus.Recusado, pedido.PedidoStatus);
+        }
+
+        [Fact]
+        public void RecusarPedido_SeNaoEstiverRecebido_DeveLancarExcecao()
+        {
+            // Arrange
+            var pedido = pedidoFake();
+
+            // Act
+            try
+            {
+                pedido.RecusarPedido();
+            }
+            catch (DomainException ex)
+            {
+                // Assert
+                Assert.Equal("Pedido não pode ser recusado, pois não foi recebido", ex.Message);
+                return;
+            }
+
+            Assert.True(false, "Deveria ter lançado exceção");
+        }
+        #endregion
+
         #region ColocarPedidoComoPronto
         [Fact]
         public void ColocarPedidoComoPronto_DeveDefinirStatusComoPronto()
