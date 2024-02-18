@@ -30,7 +30,7 @@ namespace Application.Pedidos.UseCases
             if(pedido is null)
                 return false;
 
-            pedido.ColocarPedidoComoRecebido();
+            pedido.IniciarPedido();
 
             _pedidoRepository.Adicionar(pedido);
 

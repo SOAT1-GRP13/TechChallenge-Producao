@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Domain.Pedidos;
 using RabbitMQ.Client;
 using System.Text.Json;
 using RabbitMQ.Client.Events;
@@ -12,19 +11,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.RabbitMQ.Consumers
 {
-    public class PedidoPagoSubscriber : BackgroundService
+    public class PedidoConfirmadoSubscriber : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly string _nomeDaFila;
         private IModel _channel;
 
-        public PedidoPagoSubscriber(
+        public PedidoConfirmadoSubscriber(
             IServiceScopeFactory scopeFactory,
             RabbitMQOptions options,
             IModel model)
         {
             _scopeFactory = scopeFactory;
-            _nomeDaFila = options.QueuePedidoPago;
+            _nomeDaFila = options.QueuePedidoConfirmado;
 
             _channel = model;
             _channel.ExchangeDeclare(exchange: "trigger", type: ExchangeType.Fanout);
@@ -64,9 +63,9 @@ namespace Infra.RabbitMQ.Consumers
                     throw new Exception("Erro deserializar PedidoDto", ex);
                 }
 
-                var input = new AtualizarStatusPedidoInput(pedidoPago.PedidoId, (int)PedidoStatus.Recebido);
-                var command = new AtualizarStatusPedidoCommand(input);
-                mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(command).Wait();
+                var input = new AdicionarPedidoInput(pedidoPago);
+                var command = new AdicionarPedidoCommand(input);
+                mediatorHandler.EnviarComando<AdicionarPedidoCommand, PedidoDto?>(command).Wait();
             }
         }
 

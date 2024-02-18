@@ -122,8 +122,12 @@ namespace Application.Tests.Pedidos.UseCases
         #region Metodos privados
         private Pedido pedidoFake()
         {
-            var item1 = new PedidoItem(Guid.NewGuid(), "Produto 1", 2);
-            var item2 = new PedidoItem(Guid.NewGuid(), "Produto 2", 3);
+            var pedidoId = Guid.NewGuid();
+
+            var item1 = new PedidoItem(pedidoId, Guid.NewGuid(), "Produto 1", 2);
+            item1.Pedido = null;
+            var item2 = new PedidoItem(pedidoId, Guid.NewGuid(), "Produto 2", 3);
+            item2.Pedido = null;
 
             var itens = new List<PedidoItem> { item1, item2 };
 

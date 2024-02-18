@@ -12,19 +12,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.RabbitMQ.Consumers
 {
-    public class PedidoPagoSubscriber : BackgroundService
+    public class PedidoRecusadoSubscriber : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly string _nomeDaFila;
         private IModel _channel;
 
-        public PedidoPagoSubscriber(
+        public PedidoRecusadoSubscriber(
             IServiceScopeFactory scopeFactory,
             RabbitMQOptions options,
             IModel model)
         {
             _scopeFactory = scopeFactory;
-            _nomeDaFila = options.QueuePedidoPago;
+            _nomeDaFila = options.QueuePedidoRecusado;
 
             _channel = model;
             _channel.ExchangeDeclare(exchange: "trigger", type: ExchangeType.Fanout);
@@ -64,7 +64,7 @@ namespace Infra.RabbitMQ.Consumers
                     throw new Exception("Erro deserializar PedidoDto", ex);
                 }
 
-                var input = new AtualizarStatusPedidoInput(pedidoPago.PedidoId, (int)PedidoStatus.Recebido);
+                var input = new AtualizarStatusPedidoInput(pedidoPago.PedidoId, (int)PedidoStatus.Recusado);
                 var command = new AtualizarStatusPedidoCommand(input);
                 mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(command).Wait();
             }
