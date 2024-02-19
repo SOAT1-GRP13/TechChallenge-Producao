@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Domain.Pedidos;
-using Domain.Base.DomainObjects;
 using Application.Pedidos.DTO;
 
 namespace Application.Pedidos.UseCases
 {
-    public class PedidoUseCase : IPedidoUseCase
+    public sealed class PedidoUseCase : IPedidoUseCase
     {
         #region Propriedades
         private readonly IPedidoRepository _pedidoRepository;

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Domain.Base.DomainObjects;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
 
@@ -88,7 +89,7 @@ namespace API.Tests.Controllers
             };
 
             // Act & Assert
-            var exception = Assert.Throws<Exception>(() => controller.ObterClienteId());
+            var exception = Assert.Throws<DomainException>(() => controller.ObterClienteId());
             Assert.Equal("Cliente não identificado", exception.Message);
         }
 
