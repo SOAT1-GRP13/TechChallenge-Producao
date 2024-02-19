@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Pedidos.Repository
 {
-    public class PedidoRepository : IPedidoRepository
+    public sealed class PedidoRepository : IPedidoRepository
     {
         private readonly PedidosContext _context;
 

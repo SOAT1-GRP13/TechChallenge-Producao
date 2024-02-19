@@ -1,8 +1,9 @@
-﻿using Domain.Base.Communication.Mediator;
-using Domain.Base.Messages.CommonMessages.Notifications;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Domain.Base.DomainObjects;
+using Domain.Base.Communication.Mediator;
+using Domain.Base.Messages.CommonMessages.Notifications;
 
 namespace API.Controllers
 {
@@ -39,7 +40,7 @@ namespace API.Controllers
             if (!string.IsNullOrEmpty(User.FindFirstValue(ClaimTypes.NameIdentifier)))
                 return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            throw new Exception("Cliente não identificado");
+            throw new DomainException("Cliente não identificado");
         }
     }
 }

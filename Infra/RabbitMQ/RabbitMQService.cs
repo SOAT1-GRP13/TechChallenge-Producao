@@ -1,13 +1,12 @@
 ﻿using System.Text;
 using Domain.RabbitMQ;
-using Microsoft.AspNetCore.Connections;
 using RabbitMQ.Client;
 
 namespace Infra.RabbitMQ
 {
     public class RabbitMQService : IRabbitMQService
     {
-        private IModel _channel;
+        private readonly IModel _channel;
 
         public RabbitMQService(IModel model)
         {
