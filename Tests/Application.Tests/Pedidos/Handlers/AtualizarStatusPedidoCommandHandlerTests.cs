@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Domain.Pedidos;
+using Domain.RabbitMQ;
 using Application.Pedidos.DTO;
 using Domain.Base.DomainObjects;
 using Application.Pedidos.Commands;
@@ -7,6 +8,7 @@ using Application.Pedidos.UseCases;
 using Application.Pedidos.Handlers;
 using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
+using Microsoft.Extensions.Configuration;
 using Domain.Base.Messages.CommonMessages.Notifications;
 
 namespace Application.Tests.Pedidos.Handlers
@@ -19,6 +21,8 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var rabbitMQServiceMock = new Mock<IRabbitMQService>();
+            var configurationMock = new Mock<IConfiguration>();
 
             var guid = Guid.NewGuid();
 
@@ -31,7 +35,7 @@ namespace Application.Tests.Pedidos.Handlers
 
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(guid, PedidoStatus.EmPreparacao)).ReturnsAsync(pedidoDto);
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, rabbitMQServiceMock.Object, configurationMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -48,11 +52,13 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var rabbitMQServiceMock = new Mock<IRabbitMQService>();
+            var configurationMock = new Mock<IConfiguration>();
 
             // Criando um comando com ID de pedido inválido (Guid vazio)
             var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(Guid.Empty, (int)PedidoStatus.EmPreparacao));
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, rabbitMQServiceMock.Object, configurationMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -68,6 +74,8 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var rabbitMQServiceMock = new Mock<IRabbitMQService>();
+            var configurationMock = new Mock<IConfiguration>();
 
             var guid = Guid.NewGuid();
             var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(guid, (int)PedidoStatus.EmPreparacao));
@@ -75,7 +83,7 @@ namespace Application.Tests.Pedidos.Handlers
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(guid, PedidoStatus.EmPreparacao))
                 .ThrowsAsync(new DomainException("Erro de domínio simulado"));
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, rabbitMQServiceMock.Object, configurationMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -90,6 +98,8 @@ namespace Application.Tests.Pedidos.Handlers
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var pedidoUseCaseMock = new Mock<IPedidoUseCase>();
+            var rabbitMQServiceMock = new Mock<IRabbitMQService>();
+            var configurationMock = new Mock<IConfiguration>();
 
             var guid = Guid.NewGuid();
             var command = new AtualizarStatusPedidoCommand(new AtualizarStatusPedidoInput(guid, (int)PedidoStatus.EmPreparacao));
@@ -97,7 +107,7 @@ namespace Application.Tests.Pedidos.Handlers
             // Simulando um pedido não encontrado ao retornar null
             pedidoUseCaseMock.Setup(p => p.TrocaStatusPedido(guid, PedidoStatus.EmPreparacao));
 
-            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object);
+            var handler = new AtualizarStatusPedidoCommandHandler(pedidoUseCaseMock.Object, mediatorHandlerMock.Object, rabbitMQServiceMock.Object, configurationMock.Object);
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
