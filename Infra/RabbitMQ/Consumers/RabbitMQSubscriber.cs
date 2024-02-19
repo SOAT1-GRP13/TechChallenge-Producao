@@ -73,6 +73,8 @@ namespace Infra.RabbitMQ.Consumers
             if (_channel.IsOpen)
                 _channel.Close();
 
+            GC.SuppressFinalize(this);
+
             base.Dispose();
         }
     }
