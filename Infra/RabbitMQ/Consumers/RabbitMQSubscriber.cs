@@ -16,7 +16,7 @@ namespace Infra.RabbitMQ.Consumers
         protected readonly string _nomeDaFila;
         protected readonly IModel _channel;
 
-        public RabbitMQSubscriber(
+        protected RabbitMQSubscriber(
             IServiceScopeFactory scopeFactory,
             string nomeFila,
             IModel model)
