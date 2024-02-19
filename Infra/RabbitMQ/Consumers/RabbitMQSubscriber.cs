@@ -1,6 +1,11 @@
-﻿using RabbitMQ.Client;
+﻿using System.Text;
+using RabbitMQ.Client;
+using System.Text.Json;
 using RabbitMQ.Client.Events;
+using Application.Pedidos.DTO;
+using Domain.Base.DomainObjects;
 using Microsoft.Extensions.Hosting;
+using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.RabbitMQ.Consumers
@@ -38,7 +43,30 @@ namespace Infra.RabbitMQ.Consumers
             return Task.CompletedTask;
         }
 
-        protected virtual void InvokeReceivedEvent(object? model, BasicDeliverEventArgs ea) { }
+        protected virtual void InvokeReceivedEvent(object? model, BasicDeliverEventArgs ea) 
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var mediatorHandler = scope.ServiceProvider.GetRequiredService<IMediatorHandler>();
+
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+
+                PedidoDto pedidoDto;
+                try
+                {
+                    pedidoDto = JsonSerializer.Deserialize<PedidoDto>(message) ?? new PedidoDto();
+                }
+                catch (Exception ex)
+                {
+                    throw new DomainException("Erro deserializar PedidoDto", ex);
+                }
+
+                InvokeCommand(pedidoDto, mediatorHandler);
+            }
+        }
+
+        protected virtual void InvokeCommand(PedidoDto pedidoDto, IMediatorHandler mediatorHandler) { }
 
         public override void Dispose()
         {

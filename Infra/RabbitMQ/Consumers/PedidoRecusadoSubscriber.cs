@@ -1,8 +1,5 @@
-﻿using System.Text;
-using Domain.Pedidos;
+﻿using Domain.Pedidos;
 using RabbitMQ.Client;
-using System.Text.Json;
-using RabbitMQ.Client.Events;
 using Application.Pedidos.DTO;
 using Application.Pedidos.Commands;
 using Application.Pedidos.Boundaries;
@@ -15,29 +12,11 @@ namespace Infra.RabbitMQ.Consumers
     {
         public PedidoRecusadoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(scopeFactory, options.QueuePedidoRecusado, model) { }
 
-        protected override void InvokeReceivedEvent(object? model, BasicDeliverEventArgs ea)
+        protected override void InvokeCommand(PedidoDto pedidoDto, IMediatorHandler mediatorHandler)
         {
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var mediatorHandler = scope.ServiceProvider.GetRequiredService<IMediatorHandler>();
-
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-
-                PedidoDto pedidoPago;
-                try
-                {
-                    pedidoPago = JsonSerializer.Deserialize<PedidoDto>(message) ?? new PedidoDto();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Erro deserializar PedidoDto recusado", ex);
-                }
-
-                var input = new AtualizarStatusPedidoInput(pedidoPago.PedidoId, (int)PedidoStatus.Recusado);
-                var command = new AtualizarStatusPedidoCommand(input);
-                mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(command).Wait();
-            }
+            var input = new AtualizarStatusPedidoInput(pedidoDto.PedidoId, (int)PedidoStatus.Recusado);
+            var command = new AtualizarStatusPedidoCommand(input);
+            mediatorHandler.EnviarComando<AtualizarStatusPedidoCommand, PedidoDto?>(command).Wait();
         }
     }
 }
