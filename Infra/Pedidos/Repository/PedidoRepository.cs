@@ -71,7 +71,8 @@ namespace Infra.Pedidos.Repository
 
         public void Dispose()
         {
-            _context.Dispose();
+            GC.SuppressFinalize(this);
+            _context.Dispose();            
         }
     }
 }

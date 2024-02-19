@@ -2,7 +2,7 @@ using Domain.Base.DomainObjects;
 
 namespace Domain.Base.Data
 {
-    public interface IRepository<T> : IDisposable where T : IAggregateRoot
+    public interface IRepository : IDisposable, IAggregateRoot
     {
          IUnitOfWork UnitOfWork { get; }
     }

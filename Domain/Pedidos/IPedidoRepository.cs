@@ -2,7 +2,7 @@
 
 namespace Domain.Pedidos
 {
-    public interface IPedidoRepository : IRepository<Pedido>
+    public interface IPedidoRepository : IRepository
     {
         Task<Pedido?> ObterPorId(Guid id);
         void Adicionar(Pedido pedido);

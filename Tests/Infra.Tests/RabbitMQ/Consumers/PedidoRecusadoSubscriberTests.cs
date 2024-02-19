@@ -53,7 +53,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
 
             // Assert
             Assert.NotNull(capturedException);
-            Assert.Equal("Erro deserializar PedidoDto recusado", capturedException?.Message);
+            Assert.Equal("Erro deserializar PedidoDto", capturedException?.Message);
         }
 
         [Fact]
