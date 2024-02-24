@@ -32,7 +32,7 @@ namespace Application.Pedidos.Handlers.Helper
             _configuration = configuration;
         }
 
-        public async Task<PedidoDto?> HandleHelper(Command<PedidoDto?> request, AtualizarStatusPedidoInput input, string? filaRabbit)
+        public async Task<PedidoDto?> HandleHelper(Command<PedidoDto?> request, AtualizarStatusPedidoInput input, string? nomeExchange)
         {
             if (!request.EhValido())
             {
@@ -51,11 +51,11 @@ namespace Application.Pedidos.Handlers.Helper
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(filaRabbit))
+                if (!string.IsNullOrEmpty(nomeExchange))
                 {
                     string mensagem = JsonSerializer.Serialize(pedidoDto);
-                    var fila = _configuration.GetSection("RabbitMQ:QueuePedidoPronto").Value;
-                    _rabbitMQService.PublicaMensagem(fila, mensagem);
+                    var exchange = _configuration.GetSection(nomeExchange).Value;
+                    _rabbitMQService.PublicaMensagem(exchange, mensagem);
                 }
 
                 return pedidoDto;

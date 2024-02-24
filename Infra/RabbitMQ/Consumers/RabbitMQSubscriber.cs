@@ -11,25 +11,24 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Infra.RabbitMQ.Consumers
 {
     public abstract class RabbitMQSubscriber : BackgroundService
-    {
-        protected readonly IServiceScopeFactory _scopeFactory;
+    {        
         protected readonly string _nomeDaFila;
+        protected readonly IServiceScopeFactory _scopeFactory;
         protected readonly IModel _channel;
 
         protected RabbitMQSubscriber(
-            IServiceScopeFactory scopeFactory,
+            string nomeExchage,
             string nomeFila,
+            IServiceScopeFactory scopeFactory,
             IModel model)
-        {
-            _scopeFactory = scopeFactory;
+        {            
             _nomeDaFila = nomeFila;
+            _scopeFactory = scopeFactory;
             _channel = model;
 
-            _channel.ExchangeDeclare(exchange: "trigger", type: ExchangeType.Fanout);
+            _channel.ExchangeDeclare(exchange: nomeExchage, type: ExchangeType.Fanout);
             _channel.QueueDeclare(queue: _nomeDaFila, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            _channel.QueueBind(queue: _nomeDaFila,
-                exchange: "trigger",
-                routingKey: "");
+            _channel.QueueBind(queue: _nomeDaFila, exchange: nomeExchage, routingKey: "");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
