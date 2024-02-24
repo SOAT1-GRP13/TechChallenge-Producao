@@ -12,7 +12,7 @@
             ExchangePedidoRecusado = string.Empty;
             ExchangePedidoPreparando = string.Empty;
             ExchangePedidoPronto = string.Empty;
-            ExchagenPedidoFinalizado = string.Empty;
+            ExchangePedidoFinalizado = string.Empty;
             QueuePedidoConfirmado = string.Empty;
             QueuePedidoPago = string.Empty;
             QueuePedidoRecusado = string.Empty;
@@ -28,7 +28,7 @@
         public string ExchangePedidoRecusado { get; set; }        
         public string ExchangePedidoPreparando { get; set; }        
         public string ExchangePedidoPronto { get; set; }
-        public string ExchagenPedidoFinalizado { get; set; }
+        public string ExchangePedidoFinalizado { get; set; }
         public string QueuePedidoConfirmado { get; set; }
         public string QueuePedidoPago { get; set; }
         public string QueuePedidoRecusado { get; set; }
