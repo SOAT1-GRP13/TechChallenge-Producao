@@ -10,7 +10,7 @@ namespace Infra.RabbitMQ.Consumers
 {
     public class PedidoPagoSubscriber : RabbitMQSubscriber
     {
-        public PedidoPagoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(scopeFactory, options.QueuePedidoPago, model) { }
+        public PedidoPagoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(options.ExchangePedidoPago, options.QueuePedidoPago, scopeFactory, model) { }
 
         protected override void InvokeCommand(PedidoDto pedidoDto, IMediatorHandler mediatorHandler)
         {

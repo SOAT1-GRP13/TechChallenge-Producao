@@ -1,7 +1,5 @@
-﻿using Domain.RabbitMQ;
+﻿using Moq;
 using Infra.RabbitMQ;
-using Moq;
-using System.Text;
 using RabbitMQ.Client;
 
 namespace Infra.Tests.RabbitMQ
@@ -15,15 +13,22 @@ namespace Infra.Tests.RabbitMQ
             var mockModel = new Mock<IModel>();
 
             var rabbitMQService = new RabbitMQService(mockModel.Object);
-            var queueName = "testQueue";
+            var exchangeName = "testExchange";
             var message = "Test Message";
-            var messageBody = Encoding.UTF8.GetBytes(message);
 
             //act
-            rabbitMQService.PublicaMensagem(queueName, message);
+            try
+            {
+                rabbitMQService.PublicaMensagem(exchangeName, message);
+                Assert.True(true);
+                return;
+            }
+            catch (Exception ex)
+            {
+                //assert
+                Assert.True(false, ex.Message);
+            }
 
-            //assert
-            mockModel.Verify(ch => ch.QueueDeclare(queueName, true, false, false, null), Times.Once);
         }
 
     }

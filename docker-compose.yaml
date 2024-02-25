@@ -13,8 +13,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionString=User ID=fiap;Password=SenhaLocalProducao;Host=postgres-db-producao;Port=5432;Database=techChallengeProducao;Pooling=true;
+      - RabbitMQ:Hostname=rabbitmq
     depends_on:
-      - postgres-db-producao
+      postgres-db-producao:
+        condition: service_healthy
 
   postgres-db-producao:
     hostname: postgres-compose
@@ -27,6 +29,12 @@ services:
       - "15438:5432"
     volumes:
       - tech-challenge-soat1-grp13-db-data-producao:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s  
 
 volumes:
   tech-challenge-soat1-grp13-db-data-producao:

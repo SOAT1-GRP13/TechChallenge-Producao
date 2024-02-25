@@ -13,20 +13,11 @@ namespace Infra.RabbitMQ
             _channel = model;
         }
 
-        public void PublicaMensagem(string queueName, string message)
+        public void PublicaMensagem(string exchangeName, string message)
         {
-            _channel.QueueDeclare(queue: queueName,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-
             var body = Encoding.UTF8.GetBytes(message);
 
-            _channel.BasicPublish(exchange: "",
-                                  routingKey: queueName,
-                                  basicProperties: null,
-                                  body: body);
+            _channel.BasicPublish(exchange: exchangeName, routingKey: "", basicProperties: null, body: body);
         }
     }
 

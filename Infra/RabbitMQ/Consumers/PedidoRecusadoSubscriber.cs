@@ -10,7 +10,7 @@ namespace Infra.RabbitMQ.Consumers
 {
     public class PedidoRecusadoSubscriber : RabbitMQSubscriber
     {
-        public PedidoRecusadoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(scopeFactory, options.QueuePedidoRecusado, model) { }
+        public PedidoRecusadoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(options.ExchangePedidoRecusado, options.QueuePedidoRecusado, scopeFactory, model) { }
 
         protected override void InvokeCommand(PedidoDto pedidoDto, IMediatorHandler mediatorHandler)
         {

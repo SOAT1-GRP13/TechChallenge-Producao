@@ -1,6 +1,5 @@
 using Domain.Pedidos;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 
 namespace Application.Pedidos.Boundaries
 {
@@ -26,5 +25,10 @@ namespace Application.Pedidos.Boundaries
             Title = "Status",
             Format = "enum")]
         public PedidoStatus Status { get; set; }
+
+        [SwaggerSchema(
+            Title = "Desc Status",
+            Format = "string")]
+        public string DescStatus => Status.ToString();
     }
 }
