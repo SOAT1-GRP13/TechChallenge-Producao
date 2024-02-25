@@ -22,7 +22,7 @@ namespace Application.Pedidos.Handlers
 
         public async Task<PedidoDto?> Handle(PedidoEmPreparacaoCommand request, CancellationToken cancellationToken)
         {
-            return await HandleHelper(request, request.Input, "RabbitMQ:ExchangePedidoPronto");
+            return await HandleHelper(request, request.Input, "RabbitMQ:ExchangePedidoPreparando");
         }
     }
 }

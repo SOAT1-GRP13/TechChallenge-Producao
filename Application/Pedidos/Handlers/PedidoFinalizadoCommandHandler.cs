@@ -21,7 +21,7 @@ namespace Application.Pedidos.Handlers
 
         public async Task<PedidoDto?> Handle(PedidoFinalizadoCommand request, CancellationToken cancellationToken)
         {
-            return await HandleHelper(request, request.Input, "RabbitMQ:ExchagenPedidoFinalizado");
+            return await HandleHelper(request, request.Input, "RabbitMQ:ExchangePedidoFinalizado");
         }
     }
 }
