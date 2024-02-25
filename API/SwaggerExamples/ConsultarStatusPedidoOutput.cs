@@ -13,8 +13,7 @@ namespace API.SwaggerExamples
             return new ConsultarStatusPedidoOutput
             {
                 PedidoId = Guid.NewGuid(),
-                Status = PedidoStatus.Iniciado,
-                
+                Status = PedidoStatus.Iniciado
             };
         }
     }
