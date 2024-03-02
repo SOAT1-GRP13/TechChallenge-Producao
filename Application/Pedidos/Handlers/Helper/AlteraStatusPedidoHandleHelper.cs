@@ -17,19 +17,16 @@ namespace Application.Pedidos.Handlers.Helper
         private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
         private readonly IRabbitMQService _rabbitMQService;
-        private readonly IConfiguration _configuration;
 
         public AlteraStatusPedidoHandleHelper(
             IPedidoUseCase statusPedidoUseCase,
             IMediatorHandler mediatorHandler,
-            IRabbitMQService rabbitMQService,
-            IConfiguration configuration
+            IRabbitMQService rabbitMQService
         )
         {
             _pedidoUseCase = statusPedidoUseCase;
             _mediatorHandler = mediatorHandler;
             _rabbitMQService = rabbitMQService;
-            _configuration = configuration;
         }
 
         public async Task<PedidoDto?> HandleHelper(Command<PedidoDto?> request, AtualizarStatusPedidoInput input, string? nomeExchange)
@@ -54,8 +51,7 @@ namespace Application.Pedidos.Handlers.Helper
                 if (!string.IsNullOrEmpty(nomeExchange))
                 {
                     string mensagem = JsonSerializer.Serialize(pedidoDto);
-                    var exchange = _configuration.GetSection(nomeExchange).Value;
-                    _rabbitMQService.PublicaMensagem(exchange, mensagem);
+                    _rabbitMQService.PublicaMensagem(nomeExchange, mensagem);
                 }
 
                 return pedidoDto;

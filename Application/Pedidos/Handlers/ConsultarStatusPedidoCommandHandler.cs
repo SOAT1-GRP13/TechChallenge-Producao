@@ -37,7 +37,7 @@ namespace Application.Pedidos.Handlers
 
                 if (pedido is null)
                 {
-                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido n„o encontrado"));
+                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, "Pedido n√£o encontrado"));
                     return new ConsultarStatusPedidoOutput();
                 }
 
