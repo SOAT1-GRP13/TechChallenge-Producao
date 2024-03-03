@@ -15,9 +15,8 @@ namespace Application.Pedidos.Handlers
         public AtualizarStatusPedidoCommandHandler(
             IPedidoUseCase statusPedidoUseCase,
             IMediatorHandler mediatorHandler,
-            IRabbitMQService rabbitMQService,
-            IConfiguration configuration
-        ) : base(statusPedidoUseCase, mediatorHandler, rabbitMQService, configuration) { }
+            IRabbitMQService rabbitMQService
+        ) : base(statusPedidoUseCase, mediatorHandler, rabbitMQService) { }
 
         public async Task<PedidoDto?> Handle(AtualizarStatusPedidoCommand request, CancellationToken cancellationToken)
         {

@@ -5,12 +5,14 @@ using Application.Pedidos.Commands;
 using Application.Pedidos.Boundaries;
 using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Domain.Configuration;
 
 namespace Infra.RabbitMQ.Consumers
 {
     public class PedidoRecusadoSubscriber : RabbitMQSubscriber
     {
-        public PedidoRecusadoSubscriber(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(options.ExchangePedidoRecusado, options.QueuePedidoRecusado, scopeFactory, model) { }
+        public PedidoRecusadoSubscriber(IServiceScopeFactory scopeFactory, IOptions<Secrets> options, IModel model) : base(options.Value.ExchangePedidoRecusado, options.Value.QueuePedidoRecusado, scopeFactory, model) { }
 
         protected override void InvokeCommand(PedidoDto pedidoDto, IMediatorHandler mediatorHandler)
         {

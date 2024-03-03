@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurando LoggerFactory e criando uma instância de ILogger
+// Configurando LoggerFactory e criando uma instï¿½ncia de ILogger
 var loggerFactory = LoggerFactory.Create(builder =>
 {
     builder.AddConsole();
@@ -43,10 +43,6 @@ else
     connectionString = builder.Configuration.GetSection("ConnectionString").Value ?? string.Empty;
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
-
-    var rabbitMQOptions = new RabbitMQOptions();
-    builder.Configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
-    builder.Services.AddSingleton(rabbitMQOptions);
 }
 
 builder.Services.Configure<Secrets>(builder.Configuration);

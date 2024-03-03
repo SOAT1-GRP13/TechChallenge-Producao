@@ -6,11 +6,27 @@ using RabbitMQ.Client.Events;
 using Infra.RabbitMQ.Consumers;
 using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Domain.Configuration;
 
 namespace Infra.Tests.RabbitMQ.Consumers
 {
     public class PedidoRecusadoSubscriberTests
     {
+        private readonly Mock<IOptions<Secrets>> _mockOptions;
+        private readonly Secrets _secrets;
+        public PedidoRecusadoSubscriberTests()
+        {
+            _mockOptions = new Mock<IOptions<Secrets>>();
+            _secrets = new Secrets()
+            {
+                QueuePedidoRecusado = "pedido_recusado_producao"
+
+            };
+            _mockOptions.Setup(opt => opt.Value).Returns(_secrets);
+
+        }
+
         [Fact]
         public void AoExecuteAsync_SeNaoConseguirDesSerializarDto_DeveLancarExcessao()
         {
@@ -25,8 +41,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
             mockScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
             mockServiceProvider.Setup(x => x.GetService(typeof(IMediatorHandler))).Returns(mockMediatorHandler.Object);
 
-            var options = new RabbitMQOptions { QueuePedidoRecusado = "testQueue" };
-            var serverFake = new PedidoRecusadoSubscriberFake(mockScopeFactory.Object, options, mockModel.Object);
+            var serverFake = new PedidoRecusadoSubscriberFake(mockScopeFactory.Object, _mockOptions.Object, mockModel.Object);
             var consumer = new EventingBasicConsumer(mockModel.Object);
 
             // Simula um evento Received com um corpo de mensagem inválido
@@ -70,8 +85,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
             mockScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
             mockServiceProvider.Setup(x => x.GetService(typeof(IMediatorHandler))).Returns(mockMediatorHandler.Object);
 
-            var options = new RabbitMQOptions { QueuePedidoRecusado = "testQueue" };
-            var serverFake = new PedidoRecusadoSubscriberFake(mockScopeFactory.Object, options, mockModel.Object);
+            var serverFake = new PedidoRecusadoSubscriberFake(mockScopeFactory.Object, _mockOptions.Object, mockModel.Object);
             var consumer = new EventingBasicConsumer(mockModel.Object);
 
             var eventArgs = new BasicDeliverEventArgs
@@ -105,11 +119,10 @@ namespace Infra.Tests.RabbitMQ.Consumers
             // Arrange
             var mockModel = new Mock<IModel>();
             var mockScopeFactory = new Mock<IServiceScopeFactory>();
-            var options = new RabbitMQOptions();
 
             mockModel.Setup(m => m.IsOpen).Returns(true);
 
-            var subscriber = new PedidoRecusadoSubscriber(mockScopeFactory.Object, options, mockModel.Object);
+            var subscriber = new PedidoRecusadoSubscriber(mockScopeFactory.Object, _mockOptions.Object, mockModel.Object);
 
             // Act
             try
@@ -127,7 +140,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
         #region metodos privados
         private class PedidoRecusadoSubscriberFake : PedidoRecusadoSubscriber
         {
-            public PedidoRecusadoSubscriberFake(IServiceScopeFactory scopeFactory, RabbitMQOptions options, IModel model) : base(scopeFactory, options, model)
+            public PedidoRecusadoSubscriberFake(IServiceScopeFactory scopeFactory, IOptions<Secrets> options, IModel model) : base(scopeFactory, options, model)
             {
             }
 
