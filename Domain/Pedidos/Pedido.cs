@@ -8,20 +8,23 @@ namespace Domain.Pedidos
         public Guid ClienteId { get; private set; }
         public DateTime DataCadastro { get; private set; }
         public PedidoStatus PedidoStatus { get; private set; }
+        public string ClienteEmail { get; private set; }
 
         private readonly List<PedidoItem> _pedidoItems;
         public IReadOnlyCollection<PedidoItem> PedidoItems => _pedidoItems;
 
-        public Pedido(Guid clienteId, List<PedidoItem> pedidoItems)
+        public Pedido(Guid clienteId, List<PedidoItem> pedidoItems, string clienteEmail)
         {
             ClienteId = clienteId;
             Codigo = 0;
             _pedidoItems = pedidoItems;
+            ClienteEmail = clienteEmail;
         }
 
         protected Pedido()
         {
             _pedidoItems = new List<PedidoItem>();
+            ClienteEmail = string.Empty;
         }
 
         public void IniciarPedido()

@@ -238,7 +238,7 @@ namespace Infra.Tests.Pedidos.Repository
 
             var itens = new List<PedidoItem> { item1, item2 };
 
-            var pedido = new Pedido(Guid.NewGuid(), itens);
+            var pedido = new Pedido(Guid.NewGuid(), itens, string.Empty);
 
             return pedido;
         }
